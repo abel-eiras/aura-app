@@ -36,9 +36,21 @@ proyecto sigue **Spec-Driven Development (SDD)**; lee primero la
 - Ramas `feat/NNN-descripcion`, `fix/…`, `spec/…`. PRs pequeños, uno por
   bloque de tareas.
 
-## Comandos (cuando exista el proyecto Android)
+## Comandos
 
 ```bash
-./gradlew lint testDebugUnitTest      # lo que corre CI
-./gradlew assembleDebug               # APK de desarrollo
+./gradlew lint testDebugUnitTest :domain:test assembleDebug   # lo que corre CI
+./gradlew -Paura.domainOnly=true :domain:test                  # solo el dominio, sin SDK de Android
 ```
+
+`-Paura.domainOnly=true` es la forma de probar la lógica en entornos sin acceso
+al SDK/plugin de Android (p. ej. sesiones de agente en la nube, donde
+`dl.google.com` está bloqueado). La parte Android solo la valida el CI de GitHub
+o un Android Studio: en esos entornos no des por compilado lo que no se ha
+compilado.
+
+## Skills
+
+`.claude/skills/` contiene skills de terceros revisadas (ver su README):
+estado y efectos en Compose, rendimiento de Compose y concurrencia/Flow en
+Kotlin. Se aplican al escribir o revisar esos temas.

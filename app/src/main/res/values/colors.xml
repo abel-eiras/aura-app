@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="aura_primary">#6E5BFF</color>
+    <color name="aura_primary_dark">#4B3DDB</color>
+    <color name="aura_accent">#9C8CFF</color>
+    <color name="aura_background_light">#FBFAFF</color>
+    <color name="aura_background_dark">#13121A</color>
+    <color name="aura_orb_grey">#9AA0AC</color>
+    <color name="aura_glow">#6E5BFF</color>
+</resources>

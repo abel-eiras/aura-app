@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <include domain="file" path="recordings/" />
+    <include domain="database" path="." />
+    <exclude domain="sharedpref" path="secrets.xml" />
+    <exclude domain="file" path="secrets/" />
+    <exclude domain="file" path="updates/" />
+</full-backup-content>

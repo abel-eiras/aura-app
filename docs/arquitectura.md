@@ -33,24 +33,29 @@ actualizaciones, desactivable). Ninguna otra.
 
 ## Módulos y capas
 
-Un único módulo Gradle `app` al principio (Constitución VII); se separa en
-módulos solo si los tiempos de compilación lo justifican. Paquetes:
+Dos módulos Gradle (ADR-0007): **`:domain`** (Kotlin/JVM puro: modelos,
+reglas, contratos de proveedor; sin `android.*`) y **`:app`** (Android).
+Paquetes de `:app`:
 
 ```
 io.github.abeleiras.aura
 ├── ui/            Compose: onboarding, record, recordings, note, settings, update
-├── domain/        modelos y casos de uso puros (sin Android), 100 % testeables
 ├── data/
 │   ├── db/        Room: Recording, ProcessingJob, Transcript, Note, NoteType
-│   ├── provider/  AiProvider + GeminiProvider + OpenRouterProvider
+│   ├── provider/  GeminiProvider + OpenRouterProvider (implementan AiProvider)
 │   ├── secrets/   CredentialStore (AES-GCM con clave del Android Keystore)
-│   ├── export/    ExportRepository (SAF), formateadores Markdown/JSON
-│   └── update/    UpdateRepository (GitHub Releases, descarga, verificación)
+│   ├── export/    ExportRepository (SAF)
+│   └── update/    UpdateRepository (descarga, verificación, PackageInstaller)
 ├── recording/     RecordingService, AudioRecorderEngine, CallStateMonitor  (portado de Aura)
 ├── work/          ProcessingWorker, ExportWorker
 ├── tile/ widget/  (portados de Aura)
 └── di/            Hilt
 ```
+
+Paquetes de `:domain` (`io.github.abeleiras.aura.domain`): `notes`
+(tipos, clasificador, render y rutas de exportación), `transcript`
+(modelo y hablantes), `processing` (política de reintentos, `AiProvider`,
+`NoteDrafter`), `update` (semver, selección de actualización, SHA-256).
 
 ## Stack
 

@@ -9,9 +9,11 @@ Es la evolución de [Aura](https://github.com/abel-eiras/Aura) y
 cualquiera pueda usarla sin saber de informática: instalas, pegas una clave
 (o inicias sesión en OpenRouter) y grabas.
 
-> **Estado: especificación.** Todavía no hay código ni versiones
-> descargables. Este repositorio se desarrolla con *Spec-Driven
-> Development*: primero se acuerda qué hace la app, luego se construye.
+> **Estado: en construcción (hito 0).** Hay especificaciones, la lógica de
+> dominio con tests y el pipeline de releases; todavía no hay versiones
+> descargables ni grabadora. Este repositorio se desarrolla con
+> *Spec-Driven Development*: primero se acuerda qué hace la app, luego se
+> construye. Ver la [hoja de ruta](ROADMAP.md).
 
 ## Qué hará
 

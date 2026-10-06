@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Aura</string>
+    <string name="placeholder_title">Aura</string>
+    <string name="placeholder_body">Esta versión solo comprueba que la instalación y las actualizaciones funcionan. La grabadora llega en la próxima versión.</string>
+    <string name="placeholder_version">Versión %1$s</string>
+</resources>
