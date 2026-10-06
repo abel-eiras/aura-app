@@ -49,7 +49,7 @@ io.github.abeleiras.aura
 ├── recording/     RecordingService, AudioRecorderEngine, CallStateMonitor  (portado de Aura)
 ├── work/          ProcessingWorker, ExportWorker
 ├── tile/ widget/  (portados de Aura)
-└── di/            Hilt
+└── AppContainer   dependencias (ADR-0008)
 ```
 
 Paquetes de `:domain` (`io.github.abeleiras.aura.domain`): `notes`
@@ -62,7 +62,7 @@ Paquetes de `:domain` (`io.github.abeleiras.aura.domain`): `notes`
 | Área | Elección | Motivo |
 |---|---|---|
 | Lenguaje / UI | Kotlin, Jetpack Compose, Material 3 | Igual que Aura |
-| DI | Hilt | Igual que Aura |
+| DI | `AppContainer` manual (ADR-0008) | Grafo pequeño; sin Hilt/KSP salvo Room |
 | Persistencia | Room (+ DataStore para preferencias) | Notas buscables, estados de trabajos |
 | Segundo plano | Servicio en primer plano (grabar), WorkManager (procesar, exportar) | Sobrevive a cierres y espera red |
 | Red | OkHttp + kotlinx.serialization | Sin Retrofit: pocas llamadas, menos dependencias |
