@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Respalda audios, base de datos y preferencias; NUNCA las credenciales (FR-002-05). -->
 <full-backup-content>
-    <include domain="file" path="recordings/" />
+    <include domain="file" path="." />
     <include domain="database" path="." />
+    <include domain="sharedpref" path="." />
+    <exclude domain="file" path="secrets" />
+    <exclude domain="file" path="updates" />
     <exclude domain="sharedpref" path="secrets.xml" />
-    <exclude domain="file" path="secrets/" />
-    <exclude domain="file" path="updates/" />
 </full-backup-content>
