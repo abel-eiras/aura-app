@@ -17,7 +17,8 @@ import androidx.core.content.ContextCompat
 class CallStateMonitor(private val context: Context) {
     private val telephonyManager = context.getSystemService(TelephonyManager::class.java)
     private var legacyListener: PhoneStateListener? = null
-    private var modernCallback: TelephonyCallback? = null
+    // Typed as Any so this class doesn't reference a class that only exists from API 31.
+    private var modernCallback: Any? = null
 
     @SuppressLint("MissingPermission") // guarded by the checkSelfPermission below
     fun start(onCallActive: () -> Unit, onCallEnded: () -> Unit) {
@@ -47,7 +48,9 @@ class CallStateMonitor(private val context: Context) {
     }
 
     fun stop() {
-        modernCallback?.let { telephonyManager?.unregisterTelephonyCallback(it) }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            (modernCallback as? TelephonyCallback)?.let { telephonyManager?.unregisterTelephonyCallback(it) }
+        }
         modernCallback = null
         legacyListener?.let {
             @Suppress("DEPRECATION")
