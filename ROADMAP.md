@@ -21,9 +21,9 @@ funciones.
 
 ## Hito 1 — Grabadora (v0.2.0)
 
-- [ ] **001 Grabación** completa (portada de Aura, sin Drive).
-- [ ] **006** Comprobación de versión + actualización con un toque
-      (FR-006-04…08). A partir de aquí, los amigos-testers se actualizan solos.
+- [x] **001 Grabación** completa (portada de Aura, sin Drive). *Código listo y CI en verde; falta la prueba manual en móvil (T001-18).*
+- [x] **006** Comprobación de versión + actualización con un toque
+      (FR-006-04…08). *Código listo y CI en verde; falta probar 0.1.0 → 0.2.0 en un móvil (T006-16).* A partir de aquí, los amigos-testers se actualizan solos.
 - [ ] **004** HU-004-3 (compartir audio) y HU-004-5 (carpeta de exportación,
       solo audio) → el autor ya puede sustituir Aura + Drive por
       aura-app + Syncthing + aura-transcribe.

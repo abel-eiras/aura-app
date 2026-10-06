@@ -47,6 +47,12 @@ app**: la lógica de decisión y verificación vive en `:domain`
 - **Guardas**: no actualizar con grabación o procesado en curso (FR-006-08);
   sin descargas en segundo plano.
 
+## Diseño del actualizador (hito 1, implementado)
+
+- **`:domain`**: `ReleasesClient` (una petición anónima a `/releases?per_page=20`), `ApkDownloader` (descarga a `.part`, SHA-256 en streaming contra el `.sha256` publicado, renombrado solo si coincide; nunca deja fichero a medias ni pisa uno bueno), `UpdatePolicy` (24 h, opt-out, bloqueo por grabación), `UpdateFailure`.
+- **`:app`**: `UpdateController` (estado observable, corre en el scope de la app: la descarga sobrevive a salir de la pantalla), `ApkSignatureVerifier` (certificados del APK = los de la app instalada), `ApkInstaller` (sesión de `PackageInstaller`, `USER_ACTION_NOT_REQUIRED` en Android 12+), `InstallResultReceiver`, `UpdateCard` en pantalla principal y Ajustes.
+- **Comprobación silenciosa**: no muestra errores y no vuelve a ofrecer una versión descartada; la manual (Ajustes) sí explica el fallo.
+
 ## Riesgos y mitigaciones
 
 - Clave de firma perdida → copias y procedimiento en `docs/releases.md` (FR-006-11).
@@ -61,6 +67,9 @@ app**: la lógica de decisión y verificación vive en `:domain`
 | FR-006-03 | `app/build.gradle.kts`, `Version.versionCode` | `VersionsTest` |
 | FR-006-05 | `UpdateChecker.findUpdate` | `UpdateCheckerTest` |
 | FR-006-06 (hash) | `UpdateChecker.sha256Hex/parseSha256File` | `UpdateCheckerTest` |
-| FR-006-04, 06 (firma), 07, 08 | `:app` `data/update` | Hito 1 |
+| FR-006-04 | `ReleasesClient`, `UpdatePolicy` | `UpdateNetworkTest`, `UpdatePolicyTest` |
+| FR-006-06 (hash, descarga) | `ApkDownloader` | `UpdateNetworkTest` |
+| FR-006-06 (firma), 07 | `ApkSignatureVerifier`, `ApkInstaller` | Manual (dispositivo) |
+| FR-006-08 | `UpdatePolicy.canInstallNow`, `UpdateController` | `UpdatePolicyTest` |
 | FR-006-09 | README / GitHub Pages | Hito 3 |
 | FR-006-11 | `docs/releases.md` | — |

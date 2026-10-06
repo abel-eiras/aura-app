@@ -23,8 +23,10 @@ jobs:
           distribution: temurin
           java-version: 17
       - uses: gradle/actions/setup-gradle@v4
-      - name: Lint, unit tests and debug APK
-        run: ./gradlew --no-daemon lint testDebugUnitTest :domain:test assembleDebug
+      # assembleRelease runs R8 and resource shrinking (unsigned here) so a release-only
+      # breakage shows up in CI, not on the day a tag is pushed.
+      - name: Lint, unit tests, debug APK and R8 release build
+        run: ./gradlew --no-daemon lint testDebugUnitTest :domain:test assembleDebug assembleRelease
       - name: Upload test and lint reports
         if: failure()
         uses: actions/upload-artifact@v4

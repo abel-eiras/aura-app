@@ -16,12 +16,12 @@
 
 ## Fase 2 — Hito 1 (actualizador en la app)
 
-- [ ] T006-10 Test: cliente de la API de Releases con `MockWebServer` (FR-006-04)
-- [ ] T006-11 Comprobación diaria + ajustes "buscar automáticamente" / "pre-releases"
-- [ ] T006-12 Descarga con progreso y verificación SHA-256 + certificado (FR-006-06)
-- [ ] T006-13 Instalación con `PackageInstaller`, permiso explicado antes (FR-006-07)
-- [ ] T006-14 Guarda de grabación/procesado en curso (FR-006-08)
-- [ ] T006-15 Pantalla Ajustes → Acerca de y aviso discreto (HU-006-2, 3)
+- [x] T006-10 Test: cliente de la API de Releases con `MockWebServer` (FR-006-04)
+- [x] T006-11 Comprobación diaria + ajustes "buscar automáticamente" / "pre-releases"
+- [x] T006-12 Descarga con progreso y verificación SHA-256 + certificado (FR-006-06)
+- [x] T006-13 Instalación con `PackageInstaller`, permiso explicado antes (FR-006-07)
+- [x] T006-14 Guarda de grabación/procesado en curso (FR-006-08)
+- [x] T006-15 Pantalla Ajustes → Acerca de y aviso discreto (HU-006-2, 3)
 - [ ] T006-16 Prueba manual de actualización 0.1.0 → 0.2.0 conservando datos
 
 ## Fase 3 — Hito 3
