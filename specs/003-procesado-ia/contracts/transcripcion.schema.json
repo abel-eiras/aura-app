@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/abel-eiras/aura-app/specs/003-procesado-ia/contracts/transcripcion.schema.json",
+  "title": "Transcripción de Aura",
+  "description": "Formato de la transcripción con hablantes. Es el mismo que produce aura-transcribe (metadata + segments + full_text), para que ambos sean intercambiables. Los campos marcados como opcionales pueden faltar en uno u otro productor.",
+  "type": "object",
+  "required": ["metadata", "segments", "full_text"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": [
+        "source_file",
+        "processed_at",
+        "duration_seconds",
+        "language_used",
+        "num_speakers_detected",
+        "pipeline_version"
+      ],
+      "properties": {
+        "source_file": { "type": "string", "description": "Nombre del fichero de audio, p. ej. aura_20261006_101500.ogg" },
+        "processed_at": { "type": "string", "format": "date-time", "description": "UTC, ISO 8601" },
+        "duration_seconds": { "type": "number", "minimum": 0 },
+        "language_detected": { "type": "string", "description": "Opcional. Código ISO 639-1 detectado." },
+        "language_confidence": { "type": "number", "minimum": 0, "maximum": 1, "description": "Opcional. aura-transcribe lo rellena; los proveedores LLM normalmente no." },
+        "language_used": { "type": "string", "description": "Código ISO 639-1 en que se transcribió." },
+        "num_speakers_detected": { "type": "integer", "minimum": 0 },
+        "alignment": { "type": "boolean", "description": "Opcional. true si hay timestamps por palabra." },
+        "pipeline_version": { "type": "string", "description": "Productor y versión, p. ej. 'aura-app 1.0.0' o '0.1.0' (aura-transcribe)." },
+        "processing_seconds": { "type": "number", "minimum": 0 },
+        "whisper_model": { "type": "string", "description": "Opcional, solo aura-transcribe." },
+        "diarization_model": { "type": "string", "description": "Opcional, solo aura-transcribe." },
+        "provider": { "type": "string", "enum": ["gemini", "openrouter", "aura-transcribe"], "description": "Opcional en aura-transcribe; obligatorio en aura-app." },
+        "transcription_model": { "type": "string", "description": "Opcional. Identificador del modelo del proveedor." },
+        "speaker_names": {
+          "type": "object",
+          "description": "Opcional. Nombres asignados por el usuario: { \"SPEAKER_00\": \"Ana\" }.",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+    "segments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "speaker", "start", "end", "text"],
+        "properties": {
+          "id": { "type": "integer", "minimum": 0 },
+          "speaker": { "type": "string", "pattern": "^SPEAKER_[0-9]{2}$" },
+          "start": { "type": "number", "minimum": 0, "description": "Segundos desde el inicio. En proveedores LLM es aproximado." },
+          "end": { "type": "number", "minimum": 0 },
+          "text": { "type": "string" },
+          "words": { "type": "array", "description": "Opcional, solo aura-transcribe con incluir_palabras." }
+        }
+      }
+    },
+    "full_text": {
+      "type": "string",
+      "description": "Una línea por segmento: 'SPEAKER_00: texto'. Es lo que se envía al paso de redacción."
+    }
+  }
+}

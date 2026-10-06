@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "categorias": [
+    {
+      "id": "reunion",
+      "etiqueta": "Reunión",
+      "carpeta": "Reuniones",
+      "tag": "reunion",
+      "criterio": "registro más o menos formal, varios hablantes, temas de trabajo/organización",
+      "prompt_redaccion": "Redactas el acta de una reunión a partir de la transcripción literal que te paso (con hablantes SPEAKER_00, SPEAKER_01...). No es una transcripción ni un resumen genérico: para cada tema tratado cuenta la sustancia —de qué se habló, qué se acordó y qué quedó sin acordar o pendiente de decidir—, aunque el tema haya ocupado media hora de conversación. No reproduzcas la conversación intervención por intervención; sí conserva los detalles concretos que importan (cifras, nombres, plazos, condiciones). Responde en Markdown con EXACTAMENTE estas secciones, en este orden, y nada más:\n\n## Asistentes\n## Puntos tratados\n## Decisiones tomadas\n## Tareas\n## Pendientes\n\nEn «Asistentes» lista las etiquetas de hablante y, solo si el nombre real se menciona explícitamente en el audio, añádelo entre paréntesis. En «Puntos tratados» un punto por tema, con su desenlace (qué se acordó o no), no una crónica de cómo se discutió. En «Tareas» indica el responsable si se menciona. Si una sección no tiene contenido, escribe «Ninguna».\n\nRedacta la nota en el mismo idioma que la transcripción."
+    },
+    {
+      "id": "visita_cliente",
+      "etiqueta": "Visita cliente",
+      "carpeta": "Visitas clientes",
+      "tag": "visita-cliente",
+      "criterio": "registro conversacional/informal con un cliente; se distingue de una reunión por el tono, aunque el tema también sea de trabajo",
+      "prompt_redaccion": "Redactas la minuta de una visita a un cliente a partir de la transcripción literal que te paso (hablantes SPEAKER_00, SPEAKER_01...), de registro conversacional. No es una transcripción ni un resumen genérico: para cada tema cuenta la sustancia —de qué se habló y en qué quedó—, con los detalles concretos que importan (cifras, plazos, condiciones), sin reproducir la conversación intervención por intervención. Responde en Markdown con EXACTAMENTE estas secciones, en este orden, y nada más:\n\n## Contexto\n## Temas tratados\n## Peticiones del cliente\n## Compromisos adquiridos\n## Seguimiento\n\nSi una sección no tiene contenido, escribe «Ninguno».\n\nRedacta la nota en el mismo idioma que la transcripción."
+    },
+    {
+      "id": "nota_personal",
+      "etiqueta": "Nota personal",
+      "carpeta": "Notas personales",
+      "tag": "nota-personal",
+      "criterio": "sin relación temática con trabajo ni clientes",
+      "prompt_redaccion": "A partir de la transcripción literal de una nota de voz personal que te paso, redacta una nota estructurada. No es una transcripción ni un resumen genérico: para cada idea o tema recoge la sustancia y los detalles concretos que importan, sin reproducir el audio palabra por palabra. Responde en Markdown con EXACTAMENTE estas secciones, en este orden, y nada más:\n\n## Contenido\n## Tareas o recordatorios\n\nSi «Tareas o recordatorios» no tiene contenido, escribe «Ninguna».\n\nRedacta la nota en el mismo idioma que la transcripción.",
+      "por_defecto": true
+    }
+  ]
+}

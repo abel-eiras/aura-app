@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/abel-eiras/aura-app/specs/005-tipos-de-nota/contracts/categorias.schema.json",
+  "title": "Tipos de nota de Aura",
+  "description": "Equivalente JSON de [[notas.categorias]] en el config.toml de aura-transcribe. Los nombres de campo son idénticos para que la conversión sea 1:1.",
+  "type": "object",
+  "required": ["version", "categorias"],
+  "properties": {
+    "version": { "const": 1 },
+    "categorias": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "etiqueta", "carpeta", "tag", "criterio", "prompt_redaccion"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9_]+$", "description": "Identificador interno, único, sin espacios." },
+          "etiqueta": { "type": "string", "minLength": 1, "description": "Título visible de la nota." },
+          "carpeta": { "type": "string", "minLength": 1, "description": "Subcarpeta de notas/ al exportar." },
+          "tag": { "type": "string", "pattern": "^[a-z0-9-]+$", "description": "Tag de Obsidian en el frontmatter." },
+          "criterio": { "type": "string", "minLength": 1, "description": "Una frase: cuándo elegir este tipo. Es lo único que ve el clasificador." },
+          "prompt_redaccion": { "type": "string", "minLength": 1, "description": "Instrucción de sistema completa para redactar la nota." },
+          "modelo": { "type": "string", "description": "Opcional. Modelo del proveedor activo para redactar este tipo." },
+          "por_defecto": { "type": "boolean", "description": "Opcional. Tipo usado si la clasificación devuelve un id desconocido. Como mucho uno." }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+# Gradle / Android Studio
+.gradle/
+build/
+*/build/
+local.properties
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Firma: nunca subir claves
+*.jks
+*.keystore
+keystore.properties
+
+# SO
+.DS_Store
