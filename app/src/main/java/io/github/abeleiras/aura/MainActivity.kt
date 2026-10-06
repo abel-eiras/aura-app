@@ -1,20 +1,41 @@
 package io.github.abeleiras.aura
 
+import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import io.github.abeleiras.aura.ui.main.MainScreen
+import io.github.abeleiras.aura.ui.main.MainViewModel
+import io.github.abeleiras.aura.ui.permissions.BatteryOptimizationDialog
+import io.github.abeleiras.aura.ui.permissions.PermissionDeniedDialog
+import io.github.abeleiras.aura.ui.permissions.PermissionRationaleDialog
+import io.github.abeleiras.aura.ui.recordings.RecordingsScreen
+import io.github.abeleiras.aura.ui.recordings.RecordingsViewModel
+import io.github.abeleiras.aura.ui.settings.SettingsScreen
 import io.github.abeleiras.aura.ui.theme.AuraTheme
 
 class MainActivity : ComponentActivity() {
@@ -23,24 +44,127 @@ class MainActivity : ComponentActivity() {
         val versionName = packageManager.getPackageInfo(packageName, 0).versionName.orEmpty()
         setContent {
             AuraTheme {
-                PlaceholderScreen(versionName)
+                AuraApp(versionName)
             }
         }
     }
 }
 
-/** Temporary screen for v0.1.0: proves install + update flow only (ROADMAP, hito 0). */
+private object Routes {
+    const val MAIN = "main"
+    const val SETTINGS = "settings"
+    const val RECORDINGS = "recordings"
+}
+
+private enum class Prompt { None, Rationale, PermanentlyDenied, Battery }
+
 @Composable
-private fun PlaceholderScreen(versionName: String) {
-    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-        Column(
-            modifier = Modifier.padding(32.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(stringResource(R.string.placeholder_title), style = MaterialTheme.typography.displayMedium)
-            Text(stringResource(R.string.placeholder_body), style = MaterialTheme.typography.bodyLarge)
-            Text(stringResource(R.string.placeholder_version, versionName), style = MaterialTheme.typography.labelMedium)
+private fun AuraApp(versionName: String) {
+    val context = LocalContext.current
+    val container = context.container
+    val navController = rememberNavController()
+    var prompt by remember { mutableStateOf(Prompt.None) }
+
+    val mainViewModel: MainViewModel = viewModel(factory = viewModelFactory { initializer { MainViewModel(container) } })
+    val recordingsViewModel: RecordingsViewModel = viewModel(factory = viewModelFactory { initializer { RecordingsViewModel(container) } })
+
+    fun startRecording() {
+        mainViewModel.toggleRecording()
+        if (!container.settings.batteryPromptShown && !context.isIgnoringBatteryOptimizations()) {
+            container.settings.batteryPromptShown = true
+            prompt = Prompt.Battery
         }
     }
+
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
+        container.settings.hasRequestedRecordAudioBefore = true
+        when {
+            results[Manifest.permission.RECORD_AUDIO] == true -> startRecording() // the user tapped "record"
+            context.findActivity()?.shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO) == false ->
+                prompt = Prompt.PermanentlyDenied
+        }
+    }
+    val batteryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { }
+
+    // Permissions are asked when first needed: the first tap on "record" (FR-001-10).
+    val onToggleRecording: () -> Unit = {
+        val needsPermission = !container.recordingStateHolder.status.value.isActive &&
+            !context.hasPermission(Manifest.permission.RECORD_AUDIO)
+        when {
+            !needsPermission && container.recordingStateHolder.status.value.isActive -> mainViewModel.toggleRecording()
+            !needsPermission -> startRecording()
+            container.settings.hasRequestedRecordAudioBefore &&
+                context.findActivity()?.shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO) == false ->
+                prompt = Prompt.PermanentlyDenied
+            else -> prompt = Prompt.Rationale
+        }
+    }
+
+    when (prompt) {
+        Prompt.None -> Unit
+        Prompt.Rationale -> PermissionRationaleDialog(
+            onContinue = {
+                prompt = Prompt.None
+                permissionLauncher.launch(requestedPermissions())
+            },
+            onDismiss = { prompt = Prompt.None },
+        )
+        Prompt.PermanentlyDenied -> PermissionDeniedDialog(
+            onOpenSettings = {
+                prompt = Prompt.None
+                context.startActivity(
+                    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).setData(Uri.parse("package:${context.packageName}")),
+                )
+            },
+            onDismiss = { prompt = Prompt.None },
+        )
+        Prompt.Battery -> BatteryOptimizationDialog(
+            onContinue = {
+                prompt = Prompt.None
+                batteryLauncher.launch(
+                    Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).setData(Uri.parse("package:${context.packageName}")),
+                )
+            },
+            onDismiss = { prompt = Prompt.None },
+        )
+    }
+
+    NavHost(navController = navController, startDestination = Routes.MAIN) {
+        composable(Routes.MAIN) {
+            MainScreen(
+                viewModel = mainViewModel,
+                onToggleRecording = onToggleRecording,
+                onSettingsClick = { navController.navigate(Routes.SETTINGS) },
+                onRecordingsClick = { navController.navigate(Routes.RECORDINGS) },
+            )
+        }
+        composable(Routes.RECORDINGS) {
+            RecordingsScreen(viewModel = recordingsViewModel, onBackClick = { navController.popBackStack() })
+        }
+        composable(Routes.SETTINGS) {
+            SettingsScreen(settings = container.settings, versionName = versionName, onBackClick = { navController.popBackStack() })
+        }
+    }
+}
+
+/** Microphone (required), notifications (so the recording indicator shows) and phone state (optional, for call auto-pause). */
+private fun requestedPermissions(): Array<String> = buildList {
+    add(Manifest.permission.RECORD_AUDIO)
+    add(Manifest.permission.READ_PHONE_STATE)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) add(Manifest.permission.POST_NOTIFICATIONS)
+}.toTypedArray()
+
+private fun Context.hasPermission(permission: String): Boolean =
+    ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
+
+private fun Context.isIgnoringBatteryOptimizations(): Boolean =
+    getSystemService(PowerManager::class.java)?.isIgnoringBatteryOptimizations(packageName) ?: true
+
+private fun Context.findActivity(): Activity? {
+    var current: Context? = this
+    while (current is ContextWrapper) {
+        if (current is Activity) return current
+        current = current.baseContext
+    }
+    return null
 }

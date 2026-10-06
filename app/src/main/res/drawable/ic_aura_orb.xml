@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Full-color orb: gradient disc with an inner offset arc. Used on the main screen logo. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <path android:pathData="M60,8 A52,52 0 1,1 59.9,8 Z">
+        <aapt:attr xmlns:aapt="http://schemas.android.com/aapt" name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="60"
+                android:centerX="44"
+                android:centerY="40"
+                android:startColor="#9C8CFF"
+                android:centerColor="#6E5BFF"
+                android:endColor="#4B3DDB" />
+        </aapt:attr>
+    </path>
+    <path
+        android:pathData="M30,60 A30,30 0 0,1 86,46"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:strokeAlpha="0.85" />
+</vector>
