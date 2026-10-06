@@ -16,12 +16,14 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -129,10 +131,18 @@ private fun AuraApp(versionName: String) {
         )
     }
 
+    LaunchedEffect(Unit) { container.updates.checkOnAppOpen() }
+    // Back from the "install unknown apps" settings page: carry on with the update.
+    LifecycleResumeEffect(Unit) {
+        container.updates.onResumed()
+        onPauseOrDispose { }
+    }
+
     NavHost(navController = navController, startDestination = Routes.MAIN) {
         composable(Routes.MAIN) {
             MainScreen(
                 viewModel = mainViewModel,
+                updates = container.updates,
                 onToggleRecording = onToggleRecording,
                 onSettingsClick = { navController.navigate(Routes.SETTINGS) },
                 onRecordingsClick = { navController.navigate(Routes.RECORDINGS) },
@@ -142,7 +152,7 @@ private fun AuraApp(versionName: String) {
             RecordingsScreen(viewModel = recordingsViewModel, onBackClick = { navController.popBackStack() })
         }
         composable(Routes.SETTINGS) {
-            SettingsScreen(settings = container.settings, versionName = versionName, onBackClick = { navController.popBackStack() })
+            SettingsScreen(settings = container.settings, updates = container.updates, versionName = versionName, onBackClick = { navController.popBackStack() })
         }
     }
 }

@@ -29,5 +29,7 @@ el SDK completo y el plugin de Android.
   sin acceso a `dl.google.com`.
 - Un módulo más que mantener; se acepta porque el límite entre "reglas" y
   "plataforma" ya existía en la capa `domain/` de la arquitectura.
-- Los clientes HTTP de proveedores (Gemini, OpenRouter) pueden vivir también en
-  JVM puro, probados con `MockWebServer`; se decidirá en el plan de 003.
+- **Decisión (2026-10-06):** los clientes HTTP (releases de GitHub, y más
+  adelante Gemini y OpenRouter) viven también en `:domain`, con OkHttp (que
+  funciona igual en JVM y en Android) y se prueban con `MockWebServer`. `:domain`
+  sigue sin depender de `android.*`.

@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- Optional: only to auto-pause during calls. Recording works without it. -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <!-- Lets Aura install its own updates (spec 006); the user must still allow it once in Settings. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <!-- Direct request to exempt Aura from battery optimization so long recordings aren't cut.
          Aura is not distributed through Google Play, where this permission is restricted. -->
     <uses-permission
@@ -57,6 +59,10 @@
                 android:name="android.service.quicksettings.TOGGLEABLE_TILE"
                 android:value="true" />
         </service>
+
+        <receiver
+            android:name=".data.update.InstallResultReceiver"
+            android:exported="false" />
 
         <receiver
             android:name=".widget.AuraWidgetProvider"

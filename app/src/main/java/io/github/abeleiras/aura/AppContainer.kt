@@ -4,9 +4,15 @@ import android.content.Context
 import androidx.room.Room
 import io.github.abeleiras.aura.data.RecordingRepository
 import io.github.abeleiras.aura.data.db.AuraDatabase
+import io.github.abeleiras.aura.data.update.UpdateController
 import io.github.abeleiras.aura.data.prefs.AppSettings
 import io.github.abeleiras.aura.recording.PlaybackController
+import io.github.abeleiras.aura.domain.recording.RecordingStatus
+import io.github.abeleiras.aura.domain.update.ApkDownloader
+import io.github.abeleiras.aura.domain.update.ReleasesClient
 import io.github.abeleiras.aura.recording.RecordingStateHolder
+import okhttp3.OkHttpClient
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -25,6 +31,25 @@ class AppContainer(private val context: Context) {
 
     private val database by lazy {
         Room.databaseBuilder(context, AuraDatabase::class.java, "aura.db").build()
+    }
+
+    private val http by lazy {
+        OkHttpClient.Builder()
+            .connectTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .build()
+    }
+
+    val updates by lazy {
+        val releases = ReleasesClient(http)
+        UpdateController(
+            context = appContext,
+            scope = appScope,
+            settings = settings,
+            releases = releases,
+            downloader = ApkDownloader(http, releases),
+            isRecording = { recordingStateHolder.status.value !is RecordingStatus.Idle },
+        )
     }
 
     val recordings by lazy {

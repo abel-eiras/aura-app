@@ -1,5 +1,6 @@
 package io.github.abeleiras.aura.ui.settings
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +16,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,14 +30,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.abeleiras.aura.R
+import io.github.abeleiras.aura.data.update.UpdateController
+import io.github.abeleiras.aura.ui.update.UpdateCard
 import io.github.abeleiras.aura.data.prefs.AppSettings
 import io.github.abeleiras.aura.domain.recording.AudioQuality
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(settings: AppSettings, versionName: String, onBackClick: () -> Unit) {
+fun SettingsScreen(
+    settings: AppSettings,
+    updates: UpdateController,
+    versionName: String,
+    onBackClick: () -> Unit,
+) {
     var quality by remember { mutableStateOf(settings.audioQuality) }
+    var autoCheck by remember { mutableStateOf(settings.autoUpdateCheck) }
+    var preReleases by remember { mutableStateOf(settings.includePreReleases) }
+    val updateState by updates.state.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -89,6 +103,36 @@ fun SettingsScreen(settings: AppSettings, versionName: String, onBackClick: () -
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(top = 8.dp),
             )
+            SwitchRow(R.string.settings_update_auto, autoCheck) {
+                autoCheck = it
+                settings.autoUpdateCheck = it
+            }
+            SwitchRow(R.string.settings_update_pre_releases, preReleases) {
+                preReleases = it
+                settings.includePreReleases = it
+            }
+            TextButton(onClick = updates::checkNow, modifier = Modifier.padding(top = 4.dp)) {
+                Text(stringResource(R.string.settings_update_check_now))
+            }
+            UpdateCard(
+                state = updateState,
+                onUpdate = updates::startUpdate,
+                onDismiss = null,
+                showQuietStates = true,
+                modifier = Modifier.padding(top = 8.dp),
+            )
         }
+    }
+}
+
+@Composable
+private fun SwitchRow(label: Int, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(stringResource(label), modifier = Modifier.weight(1f).padding(end = 16.dp), style = MaterialTheme.typography.bodyMedium)
+        Switch(checked = checked, onCheckedChange = onCheckedChange)
     }
 }

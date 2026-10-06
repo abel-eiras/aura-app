@@ -30,6 +30,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.abeleiras.aura.R
+import io.github.abeleiras.aura.data.update.UpdateController
+import io.github.abeleiras.aura.ui.update.UpdateCard
 import io.github.abeleiras.aura.domain.recording.RecordingPolicy
 import io.github.abeleiras.aura.domain.recording.RecordingStatus
 import io.github.abeleiras.aura.ui.components.AuraOrb
@@ -38,11 +40,13 @@ import kotlinx.coroutines.delay
 @Composable
 fun MainScreen(
     viewModel: MainViewModel,
+    updates: UpdateController,
     onToggleRecording: () -> Unit,
     onSettingsClick: () -> Unit,
     onRecordingsClick: () -> Unit,
 ) {
     val status by viewModel.status.collectAsStateWithLifecycle()
+    val updateState by updates.state.collectAsStateWithLifecycle()
 
     Scaffold { padding ->
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
@@ -54,6 +58,12 @@ fun MainScreen(
                     Icon(Icons.Outlined.Settings, contentDescription = stringResource(R.string.content_description_settings))
                 }
             }
+            UpdateCard(
+                state = updateState,
+                onUpdate = updates::startUpdate,
+                onDismiss = updates::dismissAvailable,
+                modifier = Modifier.align(Alignment.TopCenter).padding(top = 56.dp, start = 16.dp, end = 16.dp),
+            )
             MainContent(
                 status = status,
                 onToggleRecording = onToggleRecording,
