@@ -225,4 +225,6 @@
     <string name="reminder_processing_incomplete">Processing setup isn\'t finished: nothing is sent yet.</string>
     <string name="processing_details">Details</string>
     <string name="processing_details_copy">Copy</string>
+    <string name="processing_retrying_busy">The provider is busy; trying again soon…</string>
+    <string name="processing_retrying_network">No answer in time; trying again…</string>
 </resources>

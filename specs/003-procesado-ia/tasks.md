@@ -16,3 +16,4 @@
 - [ ] T003-14 Medir CE-003-1…4 con grabaciones reales
 
 - [x] T003-15 Detalle técnico del error visible y copiable en la lista de grabaciones (hallazgo de la beta.1/2: el motivo no se podía leer)
+- [x] T003-16 Tiempo de espera de 10 min para las llamadas al proveedor (a 60 s la transcripción expiraba y se reintentaba sin fin) y motivo visible durante los reintentos (hallazgo de la beta.3)

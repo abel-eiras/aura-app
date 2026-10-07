@@ -225,4 +225,6 @@
     <string name="reminder_processing_incomplete">La configuración del procesado no está terminada: aún no se envía nada.</string>
     <string name="processing_details">Detalles</string>
     <string name="processing_details_copy">Copiar</string>
+    <string name="processing_retrying_busy">El proveedor está saturado; reintentando en breve…</string>
+    <string name="processing_retrying_network">Sin respuesta a tiempo; reintentando…</string>
 </resources>

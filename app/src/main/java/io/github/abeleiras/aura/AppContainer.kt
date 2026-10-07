@@ -56,6 +56,14 @@ class AppContainer(private val context: Context) {
             .build()
     }
 
+    /**
+     * Transcribing minutes of audio makes Gemini think for longer than the 60 s the update check can wait; with that
+     * limit the call timed out, looked like "no connection" and was retried forever (found in 0.3.0-beta.3).
+     */
+    private val providerHttp by lazy {
+        http.newBuilder().readTimeout(10, TimeUnit.MINUTES).writeTimeout(2, TimeUnit.MINUTES).build()
+    }
+
     val credentials by lazy { CredentialStore(appContext) }
 
     val provider by lazy { ProviderController(settings, credentials, http, appScope) }
@@ -67,7 +75,7 @@ class AppContainer(private val context: Context) {
             recordings = recordings,
             provider = provider,
             settings = settings,
-            http = http,
+            http = providerHttp,
             afterDrafted = { exports.exportPending() },
         )
     }
