@@ -44,8 +44,6 @@ import io.github.abeleiras.aura.ui.theme.AuraTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // TEMPORARY, to prove the CI smoke test can fail. Reverted in the next commit.
-        if (packageName.isNotEmpty()) throw IllegalStateException("smoke test proof: this build is meant to crash")
         val versionName = packageManager.getPackageInfo(packageName, 0).versionName.orEmpty()
         setContent {
             AuraTheme {
