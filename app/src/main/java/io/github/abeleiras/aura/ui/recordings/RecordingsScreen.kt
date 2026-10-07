@@ -237,7 +237,7 @@ private fun RecordingRow(
                 }
             }
             val status = item.job?.status
-            if (status == JobStatus.ERROR) TextButton(onClick = onShowDetails) { Text(stringResource(R.string.processing_details)) }
+            if (status == JobStatus.ERROR || item.job?.error != null) TextButton(onClick = onShowDetails) { Text(stringResource(R.string.processing_details)) }
             when {
                 status == JobStatus.READY -> TextButton(onClick = onOpenNote) { Text(stringResource(R.string.processing_action_open)) }
                 status == null || status == JobStatus.ERROR ->
@@ -299,8 +299,14 @@ private fun ProcessingBanner(readiness: ProviderReadiness, pending: Int, onProce
 internal fun processingLabel(job: JobRecord?): String? {
     job ?: return null
     return when (job.status) {
-        JobStatus.QUEUED -> stringResource(if (job.attempts > 0) R.string.processing_retrying else R.string.processing_queued)
-        JobStatus.WAITING_NETWORK -> stringResource(R.string.processing_waiting_network)
+        JobStatus.QUEUED -> stringResource(
+            when {
+                job.attempts == 0 -> R.string.processing_queued
+                job.error == ErrorReason.PROVIDER_UNAVAILABLE || job.error == ErrorReason.RATE_LIMITED -> R.string.processing_retrying_busy
+                else -> R.string.processing_retrying
+            },
+        )
+        JobStatus.WAITING_NETWORK -> stringResource(if (job.attempts > 0) R.string.processing_retrying_network else R.string.processing_waiting_network)
         JobStatus.TRANSCRIBING -> stringResource(R.string.processing_transcribing)
         JobStatus.DRAFTING -> stringResource(R.string.processing_drafting)
         JobStatus.READY -> stringResource(R.string.processing_ready)
