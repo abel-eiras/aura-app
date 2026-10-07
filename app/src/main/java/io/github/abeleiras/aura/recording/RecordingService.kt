@@ -173,6 +173,8 @@ class RecordingService : Service() {
                     Log.e(TAG, "Could not register ${file.name}", e)
                 }
                 withContext(Dispatchers.Main.immediate) { finish() }
+                // After the service is released: copying to the export folder must not delay stopping.
+                container.exports.exportPending()
             }
         }
     }

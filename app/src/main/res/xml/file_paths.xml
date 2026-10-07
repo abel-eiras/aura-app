@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Only the recordings folder is shareable through the FileProvider (spec 004, FR-004-05). -->
+<paths>
+    <files-path name="recordings" path="recordings/" />
+</paths>

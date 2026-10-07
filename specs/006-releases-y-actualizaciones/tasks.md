@@ -24,6 +24,15 @@
 - [x] T006-15 Pantalla Ajustes → Acerca de y aviso discreto (HU-006-2, 3)
 - [ ] T006-16 Prueba manual de actualización 0.1.0 → 0.2.0 conservando datos
 
+## Fase 2b — Lecciones de la 0.1.0
+
+La 0.1.0 se cerraba al abrirla (Pixel 10 Pro): el manifiesto no declaraba `INTERNET` y la
+comprobación de versión del arranque lanzaba una `SecurityException` en un hilo de OkHttp.
+
+- [x] T006-19 Declarar `INTERNET` y test que lee el manifiesto (`ManifestPermissionsTest`)
+- [x] T006-20 Interceptor que convierte excepciones inesperadas en `IOException` (`RuntimeExceptionsAsIoException`, FR-007-05)
+- [ ] T006-18 **Prueba de humo en CI con emulador**: arrancar el APK release, esperar unos segundos y comprobar que el proceso sigue vivo (`reactivecircus/android-emulator-runner`; los runners de GitHub admiten KVM). Es lo que habría detectado el fallo antes de publicar
+
 ## Fase 3 — Hito 3
 
 - [ ] T006-17 Página de instalación con QR y capturas es/gl/en (FR-006-09)

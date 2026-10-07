@@ -27,9 +27,15 @@ class RecordingRepository(
 ) {
     fun directory(): File = recordingsDir.also { it.mkdirs() }
 
-    fun observeRecordings(): Flow<List<Recording>> = dao.observeAll().map { rows ->
-        rows.map { Recording(it.fileName, File(directory(), it.fileName), it.startedAtMillis, it.durationMillis, it.sizeBytes) }
-    }
+    fun observeRecordings(): Flow<List<Recording>> = dao.observeAll().map { rows -> rows.map(::toRecording) }
+
+    /** Oldest first, one-shot; used by the exporter. */
+    suspend fun all(): List<Recording> = dao.getAll().map(::toRecording)
+
+    suspend fun count(): Int = dao.count()
+
+    private fun toRecording(row: RecordingEntity) =
+        Recording(row.fileName, File(directory(), row.fileName), row.startedAtMillis, row.durationMillis, row.sizeBytes)
 
     /** Registers a finished file. Called before anything else reacts to the new recording. */
     suspend fun register(file: File, startedAtMillis: Long, durationMillis: Long, quality: AudioQuality) {

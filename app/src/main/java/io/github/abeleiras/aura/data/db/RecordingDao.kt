@@ -17,6 +17,12 @@ interface RecordingDao {
     @Query("DELETE FROM recordings WHERE fileName = :fileName")
     suspend fun delete(fileName: String)
 
+    @Query("SELECT * FROM recordings ORDER BY startedAtMillis ASC")
+    suspend fun getAll(): List<RecordingEntity>
+
+    @Query("SELECT COUNT(*) FROM recordings")
+    suspend fun count(): Int
+
     @Query("SELECT fileName FROM recordings")
     suspend fun fileNames(): List<String>
 }

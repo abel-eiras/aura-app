@@ -2,6 +2,7 @@ package io.github.abeleiras.aura.data.update
 
 import android.content.Context
 import android.os.StatFs
+import android.util.Log
 import io.github.abeleiras.aura.data.prefs.AppSettings
 import io.github.abeleiras.aura.domain.update.ApkDownloader
 import io.github.abeleiras.aura.domain.update.AvailableUpdate
@@ -11,6 +12,7 @@ import io.github.abeleiras.aura.domain.update.UpdateException
 import io.github.abeleiras.aura.domain.update.UpdateFailure
 import io.github.abeleiras.aura.domain.update.UpdatePolicy
 import io.github.abeleiras.aura.domain.update.Version
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -83,6 +85,12 @@ class UpdateController(
             } catch (e: UpdateException) {
                 // A silent check that fails says nothing (HU-006-2); a manual one explains.
                 if (!silent) _state.value = UpdateUiState.Failed(e.failure)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // Anything unexpected must not leave a manual check stuck on "Checking" (FR-007-06).
+                Log.w("UpdateController", "Update check failed", e)
+                if (!silent) _state.value = UpdateUiState.Failed(UpdateFailure.BAD_RESPONSE)
             }
         }
     }
