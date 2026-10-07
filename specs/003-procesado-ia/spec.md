@@ -175,6 +175,8 @@ corregir los nombres de los hablantes, sin volver a transcribir.
 
 ## Preguntas abiertas
 
+> Hallazgos preliminares (sin verificar) en `docs/spikes/proveedores-ia.md`.
+
 - Límites reales de tamaño de audio por petición en OpenRouter: si son
   menores que los de una hora de audio, el plan debe definir troceado con
   reconciliación de hablantes entre trozos, o limitar OpenRouter a la
