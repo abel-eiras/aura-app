@@ -38,3 +38,14 @@ object ProviderDefaults {
 /** FR-003-13: nothing leaves the phone unless the mode is set, a credential exists and the notice was accepted. */
 fun canSendToProvider(mode: ProcessingMode, hasCredential: Boolean, privacyAccepted: Boolean): Boolean =
     mode != ProcessingMode.NONE && hasCredential && privacyAccepted
+
+/** Why recordings are or are not being processed; the UI says it out loud instead of staying silent. */
+enum class ProviderReadiness { NO_PROVIDER, NO_KEY, KEY_INVALID, NEEDS_PRIVACY, READY }
+
+fun providerReadiness(mode: ProcessingMode, hasCredential: Boolean, credential: CredentialState, privacyAccepted: Boolean): ProviderReadiness = when {
+    mode == ProcessingMode.NONE -> ProviderReadiness.NO_PROVIDER
+    !hasCredential -> ProviderReadiness.NO_KEY
+    credential == CredentialState.INVALID -> ProviderReadiness.KEY_INVALID
+    !privacyAccepted -> ProviderReadiness.NEEDS_PRIVACY
+    else -> ProviderReadiness.READY
+}
