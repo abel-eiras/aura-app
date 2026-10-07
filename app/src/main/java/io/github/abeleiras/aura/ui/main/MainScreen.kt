@@ -19,6 +19,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,6 +47,9 @@ fun MainScreen(
     onToggleRecording: () -> Unit,
     onSettingsClick: () -> Unit,
     onRecordingsClick: () -> Unit,
+    showProcessingReminder: Boolean,
+    onSetupProcessing: () -> Unit,
+    onDismissReminder: () -> Unit,
 ) {
     val status by viewModel.status.collectAsStateWithLifecycle()
     val updateState by updates.state.collectAsStateWithLifecycle()
@@ -71,6 +76,20 @@ fun MainScreen(
                 onTogglePause = viewModel::togglePause,
                 onStop = viewModel::stopRecording,
             )
+            // A discreet offer to finish the setup that was skipped (HU-002-1, scenario 4).
+            if (showProcessingReminder && status is RecordingStatus.Idle) {
+                Card(modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 16.dp, top = 4.dp, bottom = 4.dp, end = 4.dp)) {
+                        Text(
+                            text = stringResource(R.string.reminder_processing),
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(1f),
+                        )
+                        TextButton(onClick = onSetupProcessing) { Text(stringResource(R.string.reminder_processing_action)) }
+                        TextButton(onClick = onDismissReminder) { Text(stringResource(R.string.reminder_processing_dismiss)) }
+                    }
+                }
+            }
         }
     }
 }

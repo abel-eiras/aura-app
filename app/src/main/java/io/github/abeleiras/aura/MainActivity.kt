@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -33,6 +34,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.navArgument
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import io.github.abeleiras.aura.domain.ai.ProcessingMode
 import io.github.abeleiras.aura.ui.main.MainScreen
 import io.github.abeleiras.aura.ui.main.MainViewModel
 import io.github.abeleiras.aura.ui.notes.NoteScreen
@@ -198,9 +200,17 @@ private fun AuraApp(versionName: String, openNote: String?, onOpenNoteHandled: (
             ProviderScreen(controller = container.provider, onBackClick = { navController.popBackStack() })
         }
         composable(Routes.MAIN) {
+            val providerState by container.provider.state.collectAsStateWithLifecycle()
+            var reminderDismissed by remember { mutableStateOf(container.settings.processingReminderDismissed) }
             MainScreen(
                 viewModel = mainViewModel,
                 updates = container.updates,
+                showProcessingReminder = providerState.mode == ProcessingMode.NONE && !reminderDismissed,
+                onSetupProcessing = { navController.navigate(Routes.PROVIDER) },
+                onDismissReminder = {
+                    reminderDismissed = true
+                    container.settings.processingReminderDismissed = true
+                },
                 onToggleRecording = onToggleRecording,
                 onSettingsClick = { navController.navigate(Routes.SETTINGS) },
                 onRecordingsClick = { navController.navigate(Routes.RECORDINGS) },

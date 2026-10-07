@@ -206,4 +206,12 @@
     <string name="note_merge_title">Same person?</string>
     <string name="note_merge_hint">If the app split one person into two speakers, join them.</string>
     <string name="note_merge_into">Join with %1$s</string>
+    <string name="reminder_processing">Processing isn\'t set up, so Aura only records.</string>
+    <string name="reminder_processing_action">Set up</string>
+    <string name="reminder_processing_dismiss">Not now</string>
+    <string name="provider_advanced">Advanced</string>
+    <string name="provider_model_transcribe">Transcription model</string>
+    <string name="provider_model_draft">Note writing model</string>
+    <string name="provider_models_save">Save models</string>
+    <string name="provider_models_defaults">Restore defaults</string>
 </resources>

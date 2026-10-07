@@ -206,4 +206,12 @@
     <string name="note_merge_title">É a mesma persoa?</string>
     <string name="note_merge_hint">Se a app separou unha persoa en dous falantes, únea.</string>
     <string name="note_merge_into">Unir con %1$s</string>
+    <string name="reminder_processing">O procesado non está configurado: Aura só grava.</string>
+    <string name="reminder_processing_action">Configurar</string>
+    <string name="reminder_processing_dismiss">Agora non</string>
+    <string name="provider_advanced">Avanzado</string>
+    <string name="provider_model_transcribe">Modelo de transcrición</string>
+    <string name="provider_model_draft">Modelo de redacción</string>
+    <string name="provider_models_save">Gardar modelos</string>
+    <string name="provider_models_defaults">Restaurar os de fábrica</string>
 </resources>

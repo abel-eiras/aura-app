@@ -122,7 +122,12 @@ class AppSettings(context: Context) {
         get() = prefs.getString(KEY_MODEL_DRAFT, null) ?: ProviderDefaults.GEMINI_DRAFT_MODEL
         set(value) = prefs.edit { putString(KEY_MODEL_DRAFT, value) }
 
+    var processingReminderDismissed: Boolean
+        get() = prefs.getBoolean(KEY_REMINDER_DISMISSED, false)
+        set(value) = prefs.edit { putBoolean(KEY_REMINDER_DISMISSED, value) }
+
     private companion object {
+        const val KEY_REMINDER_DISMISSED = "processing_reminder_dismissed"
         const val KEY_AUTO_PROCESS = "auto_process"
         const val KEY_NOTIFY_READY = "notify_when_ready"
         const val KEY_MODEL_TRANSCRIBE = "model_transcribe"

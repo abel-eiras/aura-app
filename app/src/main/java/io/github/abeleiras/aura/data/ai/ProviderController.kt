@@ -6,6 +6,7 @@ import io.github.abeleiras.aura.domain.ai.CredentialCheck
 import io.github.abeleiras.aura.domain.ai.CredentialState
 import io.github.abeleiras.aura.domain.ai.GeminiClient
 import io.github.abeleiras.aura.domain.ai.ProcessingMode
+import io.github.abeleiras.aura.domain.ai.ProviderDefaults
 import io.github.abeleiras.aura.domain.ai.canSendToProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -118,6 +119,15 @@ class ProviderController(
     /** The key for the processing worker (spec 003); null unless FR-003-13 allows sending. */
     fun keyForSending(): String? =
         if (_state.value.canSend) credentials.get(CredentialStore.GEMINI_KEY) else null
+
+    /** FR-002-07: models in use; the defaults live in [io.github.abeleiras.aura.domain.ai.ProviderDefaults]. */
+    val transcribeModel: String get() = settings.transcribeModel
+    val draftModel: String get() = settings.draftModel
+
+    fun saveModels(transcribe: String, draft: String) {
+        settings.transcribeModel = transcribe.trim().ifEmpty { ProviderDefaults.GEMINI_TRANSCRIBE_MODEL }
+        settings.draftModel = draft.trim().ifEmpty { ProviderDefaults.GEMINI_DRAFT_MODEL }
+    }
 
     fun clipboardKeyOrNull(text: String?): String? = ApiKeys.geminiKeyOrNull(text)
 
