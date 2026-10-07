@@ -114,6 +114,17 @@ class AppSettings(context: Context) {
         get() = prefs.getBoolean(KEY_NOTIFY_READY, true)
         set(value) = prefs.edit { putBoolean(KEY_NOTIFY_READY, value) }
 
+    /** True once the user typed model names themselves; the app then never replaces them. */
+    var modelsCustomized: Boolean
+        get() = prefs.getBoolean(KEY_MODELS_CUSTOMIZED, false)
+        set(value) = prefs.edit { putBoolean(KEY_MODELS_CUSTOMIZED, value) }
+
+    fun resetModels() = prefs.edit {
+        remove(KEY_MODEL_TRANSCRIBE)
+        remove(KEY_MODEL_DRAFT)
+        putBoolean(KEY_MODELS_CUSTOMIZED, false)
+    }
+
     var transcribeModel: String
         get() = prefs.getString(KEY_MODEL_TRANSCRIBE, null) ?: ProviderDefaults.GEMINI_TRANSCRIBE_MODEL
         set(value) = prefs.edit { putString(KEY_MODEL_TRANSCRIBE, value) }
@@ -130,6 +141,7 @@ class AppSettings(context: Context) {
         const val KEY_REMINDER_DISMISSED = "processing_reminder_dismissed"
         const val KEY_AUTO_PROCESS = "auto_process"
         const val KEY_NOTIFY_READY = "notify_when_ready"
+        const val KEY_MODELS_CUSTOMIZED = "models_customized"
         const val KEY_MODEL_TRANSCRIBE = "model_transcribe"
         const val KEY_MODEL_DRAFT = "model_draft"
         const val KEY_ONBOARDING_DONE = "onboarding_done"

@@ -227,4 +227,6 @@
     <string name="processing_details_copy">Copiar</string>
     <string name="processing_retrying_busy">O provedor está saturado; reintentando en breve…</string>
     <string name="processing_retrying_network">Sen resposta a tempo; reintentando…</string>
+    <string name="processing_error_model">O modelo xa non está dispoñible. Escolle outro en Axustes → Procesado → Avanzado.</string>
+    <string name="provider_models_available">Dispoñibles para a túa chave: %1$s</string>
 </resources>

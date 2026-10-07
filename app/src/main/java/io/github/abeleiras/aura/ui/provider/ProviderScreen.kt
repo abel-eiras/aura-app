@@ -62,6 +62,7 @@ fun ProviderScreen(controller: ProviderController, onBackClick: () -> Unit) {
 private fun AdvancedModels(controller: ProviderController) {
     var transcribe by remember { mutableStateOf(controller.transcribeModel) }
     var draft by remember { mutableStateOf(controller.draftModel) }
+    val state by controller.state.collectAsStateWithLifecycle()
     Column(modifier = Modifier.padding(top = 24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(stringResource(R.string.provider_advanced), style = MaterialTheme.typography.titleMedium)
         OutlinedTextField(
@@ -78,12 +79,15 @@ private fun AdvancedModels(controller: ProviderController) {
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
         )
+        if (state.models.isNotEmpty()) {
+            Text(stringResource(R.string.provider_models_available, state.models.take(8).joinToString(", ")), style = MaterialTheme.typography.bodySmall)
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(onClick = { controller.saveModels(transcribe, draft) }) { Text(stringResource(R.string.provider_models_save)) }
             OutlinedButton(onClick = {
                 controller.saveModels("", "")
                 transcribe = controller.transcribeModel
-                draft = controller.draftModel
+                draft = controller.draftModel // shows the alias until the new check picks a model
             }) { Text(stringResource(R.string.provider_models_defaults)) }
         }
     }

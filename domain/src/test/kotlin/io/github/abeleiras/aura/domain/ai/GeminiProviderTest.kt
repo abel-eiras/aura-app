@@ -147,7 +147,9 @@ class GeminiProviderTest {
         check(503, "overloaded", ErrorReason.PROVIDER_UNAVAILABLE, true)
         check(400, """{"error":{"message":"User location is not supported for the API use."}}""", ErrorReason.PROVIDER_UNAVAILABLE, false)
         check(400, """{"error":{"message":"Audio duration exceeds the limit"}}""", ErrorReason.AUDIO_TOO_LONG, false)
-        check(404, "", ErrorReason.UNKNOWN, false)
+        check(404, """{"error":{"message":"models/gemini-2.5-flash is not found for API version v1beta"}}""", ErrorReason.MODEL_UNAVAILABLE, false)
+        check(400, """{"error":{"message":"This model is no longer available to new users. Please update your code to use a newer model."}}""", ErrorReason.MODEL_UNAVAILABLE, false)
+        check(418, "", ErrorReason.UNKNOWN, false)
     }
 
     @Test

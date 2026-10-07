@@ -49,6 +49,7 @@ import java.time.Instant
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Queue and runner of the processing of recordings (spec 003). WorkManager keeps the work alive when the user
@@ -168,6 +169,11 @@ class ProcessingRepository(
             Log.e("Processing", "Unexpected failure for $fileName", e)
             store.saveJob(id, JobRecord(JobStatus.ERROR, error = ErrorReason.UNKNOWN, message = "${e.javaClass.simpleName}: ${e.message}", updatedAt = Instant.now().toString()))
             ProcessingOutcome.Finished(JobStatus.ERROR, ErrorReason.UNKNOWN)
+        }
+        if (outcome is ProcessingOutcome.Finished && outcome.error == ErrorReason.MODEL_UNAVAILABLE && provider.refreshModelsAfterUnavailable()) {
+            // The model was retired: a different one was picked from what the key has, so run again with it.
+            store.saveJob(id, JobRecord(JobStatus.QUEUED, updatedAt = Instant.now().toString()))
+            return@withLock ProcessingOutcome.RetryLater(15.seconds)
         }
         if (outcome is ProcessingOutcome.Finished && outcome.status != JobStatus.ERROR) {
             if (outcome.status == JobStatus.READY) notifyReady(recording.fileName, recording.startedAtMillis, id)

@@ -321,6 +321,7 @@ internal fun processingLabel(job: JobRecord?): String? {
                 ErrorReason.INSUFFICIENT_FUNDS -> R.string.processing_error_funds
                 ErrorReason.AUDIO_TOO_LONG -> R.string.processing_error_too_long
                 ErrorReason.INVALID_RESPONSE -> R.string.processing_error_invalid_response
+                ErrorReason.MODEL_UNAVAILABLE -> R.string.processing_error_model
                 ErrorReason.UNKNOWN, null -> R.string.processing_error_unknown
             },
         )
