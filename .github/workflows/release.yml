@@ -54,15 +54,21 @@ jobs:
 
       - name: Verificar firma y calcular sumas
         run: |
+          set -euo pipefail
           apk="$(ls app/build/outputs/apk/release/*.apk)"
           mkdir -p dist
           cp "$apk" "dist/aura-${VERSION}.apk"
           apksigner="$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)"
           "$apksigner" verify --print-certs "dist/aura-${VERSION}.apk" | tee dist/signature.txt
-          grep -q "Signer #1 certificate SHA-256" dist/signature.txt
+          # apksigner prints "V2 Signer: certificate SHA-256 digest: <hex>" (or V3/V1, or
+          # "Signer #1 ..." with --verbose): take the first digest line, whatever the scheme.
+          cert="$(grep -m1 'certificate SHA-256 digest:' dist/signature.txt | sed 's/.*certificate SHA-256 digest: //')" || true
+          if ! printf '%s' "$cert" | grep -Eq '^[0-9a-f]{64}$'; then
+            echo "::error::apksigner no mostró la huella SHA-256 del certificado"
+            exit 1
+          fi
           (cd dist && sha256sum "aura-${VERSION}.apk" > "aura-${VERSION}.apk.sha256")
           cat "dist/aura-${VERSION}.apk.sha256"
-          cert="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' dist/signature.txt)"
           {
             echo "**Huella SHA-256 del certificado de firma** (debe ser siempre la misma):"
             echo
