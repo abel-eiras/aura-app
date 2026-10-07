@@ -245,13 +245,13 @@ class GeminiProvider(
     } catch (e: CancellationException) {
         throw e
     } catch (e: IOException) {
-        throw ProviderException(ErrorReason.NETWORK, transient = true, message = "Network error", cause = e)
+        throw ProviderException(ErrorReason.NETWORK, transient = true, message = "Network error: ${e.javaClass.simpleName}: ${e.message}", cause = e)
     }
 
     private suspend fun checkSuccess(response: Response): String {
         val body = withContext(Dispatchers.IO) { response.body?.string().orEmpty() }
         if (response.isSuccessful) return body
-        throw errorFor(response.code, body)
+        throw errorFor(response.code, body, response.request.url.encodedPath)
     }
 
     private fun parseObject(text: String): JsonObject = try {
@@ -283,25 +283,27 @@ class GeminiProvider(
         }
 
         /** Maps an HTTP error to what the user should be told and whether retrying can help (FR-003-07). */
-        fun errorFor(code: Int, body: String): ProviderException {
+        fun errorFor(code: Int, body: String, where: String = ""): ProviderException {
             val message = try {
                 Json.parseToJsonElement(body).jsonObject["error"]?.jsonObject?.get("message")?.jsonPrimitive?.contentOrNull.orEmpty()
             } catch (_: Exception) {
                 ""
             }
             val lower = message.lowercase()
+            // What the user can copy from the error details to report it: never contains the key (it travels in a header).
+            val detail = "HTTP $code" + (if (where.isNotBlank()) " on $where" else "") + (if (message.isNotBlank()) ": $message" else "")
             return when {
                 "location is not supported" in lower ->
-                    ProviderException(ErrorReason.PROVIDER_UNAVAILABLE, false, "Gemini is not available in this country")
+                    ProviderException(ErrorReason.PROVIDER_UNAVAILABLE, false, "Gemini is not available in this country ($detail)")
                 code == 429 && ("per day" in lower || "daily" in lower || "perday" in lower) ->
-                    ProviderException(ErrorReason.QUOTA_EXHAUSTED, false, message)
-                code == 429 -> ProviderException(ErrorReason.RATE_LIMITED, true, message)
+                    ProviderException(ErrorReason.QUOTA_EXHAUSTED, false, detail)
+                code == 429 -> ProviderException(ErrorReason.RATE_LIMITED, true, detail)
                 code == 401 || code == 403 || (code == 400 && "api key" in lower) ->
-                    ProviderException(ErrorReason.INVALID_CREDENTIAL, false, message)
+                    ProviderException(ErrorReason.INVALID_CREDENTIAL, false, detail)
                 code == 400 && ("too long" in lower || "exceeds" in lower || "duration" in lower) ->
-                    ProviderException(ErrorReason.AUDIO_TOO_LONG, false, message)
-                code >= 500 -> ProviderException(ErrorReason.PROVIDER_UNAVAILABLE, true, message.ifBlank { "HTTP $code" })
-                else -> ProviderException(ErrorReason.UNKNOWN, false, message.ifBlank { "HTTP $code" })
+                    ProviderException(ErrorReason.AUDIO_TOO_LONG, false, detail)
+                code >= 500 -> ProviderException(ErrorReason.PROVIDER_UNAVAILABLE, true, detail)
+                else -> ProviderException(ErrorReason.UNKNOWN, false, detail)
             }
         }
 

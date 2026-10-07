@@ -223,4 +223,6 @@
     <string name="banner_setup">Rematar a configuración</string>
     <string name="banner_process_all">Procesalas agora</string>
     <string name="reminder_processing_incomplete">A configuración do procesado non está rematada: aínda non se envía nada.</string>
+    <string name="processing_details">Detalles</string>
+    <string name="processing_details_copy">Copiar</string>
 </resources>

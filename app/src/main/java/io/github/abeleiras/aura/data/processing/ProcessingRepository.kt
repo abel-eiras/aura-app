@@ -166,7 +166,7 @@ class ProcessingRepository(
         } catch (e: Exception) {
             // A bug or a disk problem, not a provider failure: show an error instead of leaving "Transcribing…" forever.
             Log.e("Processing", "Unexpected failure for $fileName", e)
-            store.saveJob(id, JobRecord(JobStatus.ERROR, error = ErrorReason.UNKNOWN, message = e.javaClass.simpleName, updatedAt = Instant.now().toString()))
+            store.saveJob(id, JobRecord(JobStatus.ERROR, error = ErrorReason.UNKNOWN, message = "${e.javaClass.simpleName}: ${e.message}", updatedAt = Instant.now().toString()))
             ProcessingOutcome.Finished(JobStatus.ERROR, ErrorReason.UNKNOWN)
         }
         if (outcome is ProcessingOutcome.Finished && outcome.status != JobStatus.ERROR) {

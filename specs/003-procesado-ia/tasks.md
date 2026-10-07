@@ -14,3 +14,5 @@
 - [x] T003-12 Aviso de privacidad previo al primer envío (FR-003-13): `canSendToProvider` + `ProviderSetup`
 - [x] T003-13 Regenerar redacción / cambiar tipo / transcribir de nuevo con aviso de coste (FR-003-11): `ProcessingPipeline.run(forcedType)`, `ProcessingRepository.regenerate`
 - [ ] T003-14 Medir CE-003-1…4 con grabaciones reales
+
+- [x] T003-15 Detalle técnico del error visible y copiable en la lista de grabaciones (hallazgo de la beta.1/2: el motivo no se podía leer)
