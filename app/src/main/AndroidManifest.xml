@@ -38,6 +38,14 @@
             </intent-filter>
         </activity>
 
+        <!-- Error screen (spec 007) in its own process so it shows even if the main one fails to start. -->
+        <activity
+            android:name=".crash.CrashActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
+            android:process=":crash" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

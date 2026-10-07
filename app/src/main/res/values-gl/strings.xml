@@ -105,4 +105,10 @@
     <string name="recordings_delete_confirm_body_exported">A gravación eliminarase deste teléfono e non se poderá recuperar. A copia xa exportada ao teu cartafol non se borra.</string>
     <string name="content_description_share_recording">Compartir gravación</string>
     <string name="share_chooser_title">Compartir gravación</string>
+    <string name="crash_title">Aura pechouse por un erro</string>
+    <string name="crash_body">Non se enviou nada a ningún sitio. Se queres que se arranxe, copia ou comparte os detalles de abaixo con quen mantén Aura.</string>
+    <string name="crash_copy">Copiar</string>
+    <string name="crash_share">Compartir</string>
+    <string name="crash_close">Pechar</string>
+    <string name="crash_copied">Copiado</string>
 </resources>

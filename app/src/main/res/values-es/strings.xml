@@ -105,4 +105,10 @@
     <string name="recordings_delete_confirm_body_exported">La grabación se eliminará de este teléfono y no se podrá recuperar. La copia ya exportada a tu carpeta no se borra.</string>
     <string name="content_description_share_recording">Compartir grabación</string>
     <string name="share_chooser_title">Compartir grabación</string>
+    <string name="crash_title">Aura se ha cerrado por un error</string>
+    <string name="crash_body">No se ha enviado nada a ningún sitio. Si quieres que se arregle, copia o comparte los detalles de abajo con quien mantiene Aura.</string>
+    <string name="crash_copy">Copiar</string>
+    <string name="crash_share">Compartir</string>
+    <string name="crash_close">Cerrar</string>
+    <string name="crash_copied">Copiado</string>
 </resources>
