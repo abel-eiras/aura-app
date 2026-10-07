@@ -18,6 +18,11 @@ class MainViewModel(private val container: AppContainer) : ViewModel() {
         }
     }
 
+    /** The explicit "stop and save" button (spec 001, HU-001-1 scenario 3). */
+    fun stopRecording() {
+        if (status.value !is RecordingStatus.Idle) RecordingService.stop(container.appContext)
+    }
+
     fun togglePause() {
         when (status.value) {
             is RecordingStatus.Recording -> RecordingService.pause(container.appContext)

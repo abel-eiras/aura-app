@@ -5,7 +5,7 @@
 - [x] T005-03 Modelos, parseo y validación en `:domain`
 - [x] T005-04 `NoteClassifier`
 - [ ] T005-05 Persistir tipos en Room e instalar los predefinidos al primer arranque (hito 2)
-- [ ] T005-06 Traducir los predefinidos a gl/en (FR-005-01)
+- [x] T005-06 Traducir los predefinidos a gl/en (FR-005-01): `categorias.default.{en,gl}.json` + `NoteTypeCatalogs.defaults(language)`
 - [ ] T005-07 Ajustes → Tipos de nota: listar, crear, editar, borrar, restaurar (HU-005-2) *(post-1.0)*
 - [ ] T005-08 Importar/exportar `categorias.json` en la UI (HU-005-3) *(post-1.0)*
 - [ ] T005-09 Comprobar CE-005-1: conversión 1:1 con el TOML de aura-transcribe

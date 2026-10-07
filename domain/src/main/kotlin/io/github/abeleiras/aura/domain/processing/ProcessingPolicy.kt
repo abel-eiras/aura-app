@@ -37,6 +37,7 @@ sealed interface FailureDecision {
 /** Retry and resume rules for the two-step pipeline (FR-003-01, FR-003-07, FR-003-08). */
 object ProcessingPolicy {
     const val MAX_ATTEMPTS = 5
+    const val MAX_INVALID_RESPONSE_ATTEMPTS = 2
     const val MAX_AUDIO_SECONDS = 3 * 60 * 60
 
     private val BASE_DELAY = 15.seconds
@@ -52,6 +53,8 @@ object ProcessingPolicy {
     /** [attempts] = failed attempts so far on the current step, including this one. */
     fun onFailure(error: ProviderException, attempts: Int): FailureDecision = when {
         !error.transient -> FailureDecision.GiveUp(error.reason)
+        // Spec 003, edge case: an answer in the wrong format is retried once, not five times.
+        error.reason == ErrorReason.INVALID_RESPONSE && attempts >= MAX_INVALID_RESPONSE_ATTEMPTS -> FailureDecision.GiveUp(error.reason)
         attempts >= MAX_ATTEMPTS -> FailureDecision.GiveUp(error.reason)
         else -> FailureDecision.Retry(backoff(attempts))
     }

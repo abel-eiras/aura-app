@@ -2,6 +2,7 @@ package io.github.abeleiras.aura.domain.export
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -55,5 +56,14 @@ class ExportTest {
     fun `FR-004-09 in-progress copies are recognisable`() {
         assertTrue(ExportNaming.isPartial("aura_1.ogg.part"))
         assertFalse(ExportNaming.isPartial("aura_1.ogg"))
+    }
+
+    // FR-004-08: derived files are rewritten only when their content changed
+    @Test
+    fun `content hash is stable and sensitive to changes`() {
+        val a = ExportNaming.contentHash("hola".toByteArray())
+        assertEquals(a, ExportNaming.contentHash("hola".toByteArray()))
+        assertNotEquals(a, ExportNaming.contentHash("hola!".toByteArray()))
+        assertEquals(64, a.length)
     }
 }

@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "categorias": [
+    {
+      "id": "reunion",
+      "etiqueta": "Meeting",
+      "carpeta": "Meetings",
+      "tag": "reunion",
+      "criterio": "moderately formal register, several speakers, work or organisational topics",
+      "prompt_redaccion": "You write the minutes of a meeting from the verbatim transcript I give you (with speakers SPEAKER_00, SPEAKER_01...). This is neither a transcript nor a generic summary: for each topic discussed, convey the substance — what was talked about, what was agreed and what was left open or pending a decision — even if the topic took half an hour of conversation. Do not reproduce the conversation turn by turn; do keep the concrete details that matter (figures, names, deadlines, conditions). Answer in Markdown with EXACTLY these sections, in this order, and nothing else:\n\n## Attendees\n## Topics discussed\n## Decisions made\n## Tasks\n## Pending\n\nIn \"Attendees\" list the speaker labels and, only if the real name is explicitly mentioned in the audio, add it in parentheses. In \"Topics discussed\" give one point per topic, with its outcome (what was or was not agreed), not a chronicle of how it was discussed. In \"Tasks\" state the person responsible if mentioned. If a section has no content, write \"None\".\n\nWrite the note in the same language as the transcript."
+    },
+    {
+      "id": "visita_cliente",
+      "etiqueta": "Client visit",
+      "carpeta": "Client visits",
+      "tag": "visita-cliente",
+      "criterio": "conversational/informal register with a client; it differs from a meeting by its tone, even if the subject is also work",
+      "prompt_redaccion": "You write the notes of a client visit from the verbatim transcript I give you (speakers SPEAKER_00, SPEAKER_01...), in a conversational register. This is neither a transcript nor a generic summary: for each topic convey the substance — what was discussed and where it ended up — with the concrete details that matter (figures, deadlines, conditions), without reproducing the conversation turn by turn. Answer in Markdown with EXACTLY these sections, in this order, and nothing else:\n\n## Context\n## Topics discussed\n## Client requests\n## Commitments made\n## Follow-up\n\nIf a section has no content, write \"None\".\n\nWrite the note in the same language as the transcript."
+    },
+    {
+      "id": "nota_personal",
+      "etiqueta": "Personal note",
+      "carpeta": "Personal notes",
+      "tag": "nota-personal",
+      "criterio": "no thematic relation to work or clients",
+      "prompt_redaccion": "From the verbatim transcript of a personal voice note that I give you, write a structured note. This is neither a transcript nor a generic summary: for each idea or topic capture the substance and the concrete details that matter, without reproducing the audio word for word. Answer in Markdown with EXACTLY these sections, in this order, and nothing else:\n\n## Content\n## Tasks or reminders\n\nIf \"Tasks or reminders\" has no content, write \"None\".\n\nWrite the note in the same language as the transcript.",
+      "por_defecto": true
+    }
+  ]
+}

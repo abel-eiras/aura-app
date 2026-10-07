@@ -25,36 +25,71 @@ import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
+import androidx.navigation.navArgument
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import io.github.abeleiras.aura.domain.ai.ProcessingMode
 import io.github.abeleiras.aura.ui.main.MainScreen
 import io.github.abeleiras.aura.ui.main.MainViewModel
+import io.github.abeleiras.aura.ui.notes.NoteScreen
+import io.github.abeleiras.aura.ui.notes.NoteViewModel
+import io.github.abeleiras.aura.ui.onboarding.OnboardingScreen
 import io.github.abeleiras.aura.ui.permissions.BatteryOptimizationDialog
 import io.github.abeleiras.aura.ui.permissions.PermissionDeniedDialog
 import io.github.abeleiras.aura.ui.permissions.PermissionRationaleDialog
+import io.github.abeleiras.aura.ui.provider.ProviderScreen
 import io.github.abeleiras.aura.ui.recordings.RecordingsScreen
 import io.github.abeleiras.aura.ui.recordings.RecordingsViewModel
 import io.github.abeleiras.aura.ui.settings.SettingsScreen
 import io.github.abeleiras.aura.ui.theme.AuraTheme
 
 class MainActivity : ComponentActivity() {
+    /** File name of the recording whose note a notification asked to open; consumed by the UI once. */
+    private val openNote = mutableStateOf<String?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        openNote.value = intent?.getStringExtra(EXTRA_OPEN_NOTE)
         val versionName = packageManager.getPackageInfo(packageName, 0).versionName.orEmpty()
         setContent {
             AuraTheme {
-                AuraApp(versionName)
+                AuraApp(versionName, openNote.value, onOpenNoteHandled = { openNote.value = null })
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        intent.getStringExtra(EXTRA_OPEN_NOTE)?.let { openNote.value = it }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        container.processing.uiVisible = true
+    }
+
+    override fun onStop() {
+        container.processing.uiVisible = false
+        super.onStop()
+    }
+
+    companion object {
+        const val EXTRA_OPEN_NOTE = "open_note"
     }
 }
 
 private object Routes {
+    const val ONBOARDING = "onboarding"
     const val MAIN = "main"
+    const val PROVIDER = "provider"
+    const val NOTE = "note/{file}"
+    fun note(file: String) = "note/${Uri.encode(file)}"
     const val SETTINGS = "settings"
     const val RECORDINGS = "recordings"
 }
@@ -62,7 +97,7 @@ private object Routes {
 private enum class Prompt { None, Rationale, PermanentlyDenied, Battery }
 
 @Composable
-private fun AuraApp(versionName: String) {
+private fun AuraApp(versionName: String, openNote: String?, onOpenNoteHandled: () -> Unit) {
     val context = LocalContext.current
     val container = context.container
     val navController = rememberNavController()
@@ -133,6 +168,13 @@ private fun AuraApp(versionName: String) {
     }
 
     LaunchedEffect(Unit) { container.updates.checkOnAppOpen() }
+    // A "note ready" notification was tapped (HU-003-1, scenario 4).
+    LaunchedEffect(openNote) {
+        if (openNote != null) {
+            navController.navigate(Routes.note(openNote))
+            onOpenNoteHandled()
+        }
+    }
     // Back from the "install unknown apps" settings page: carry on with the update.
     LifecycleResumeEffect(Unit) {
         container.updates.onResumed()
@@ -141,21 +183,56 @@ private fun AuraApp(versionName: String) {
         onPauseOrDispose { }
     }
 
-    NavHost(navController = navController, startDestination = Routes.MAIN) {
+    NavHost(
+        navController = navController,
+        startDestination = if (container.settings.onboardingDone) Routes.MAIN else Routes.ONBOARDING,
+    ) {
+        composable(Routes.ONBOARDING) {
+            OnboardingScreen(
+                settings = container.settings,
+                provider = container.provider,
+                onFinished = {
+                    navController.navigate(Routes.MAIN) { popUpTo(Routes.ONBOARDING) { inclusive = true } }
+                },
+            )
+        }
+        composable(Routes.PROVIDER) {
+            ProviderScreen(controller = container.provider, onBackClick = { navController.popBackStack() })
+        }
         composable(Routes.MAIN) {
+            val providerState by container.provider.state.collectAsStateWithLifecycle()
+            var reminderDismissed by remember { mutableStateOf(container.settings.processingReminderDismissed) }
             MainScreen(
                 viewModel = mainViewModel,
                 updates = container.updates,
+                showProcessingReminder = providerState.mode == ProcessingMode.NONE && !reminderDismissed,
+                onSetupProcessing = { navController.navigate(Routes.PROVIDER) },
+                onDismissReminder = {
+                    reminderDismissed = true
+                    container.settings.processingReminderDismissed = true
+                },
                 onToggleRecording = onToggleRecording,
                 onSettingsClick = { navController.navigate(Routes.SETTINGS) },
                 onRecordingsClick = { navController.navigate(Routes.RECORDINGS) },
             )
         }
         composable(Routes.RECORDINGS) {
-            RecordingsScreen(viewModel = recordingsViewModel, onBackClick = { navController.popBackStack() })
+            RecordingsScreen(
+                viewModel = recordingsViewModel,
+                onOpenNote = { navController.navigate(Routes.note(it)) },
+                onBackClick = { navController.popBackStack() },
+            )
+        }
+        composable(Routes.NOTE, arguments = listOf(navArgument("file") { type = NavType.StringType })) { entry ->
+            val file = entry.arguments?.getString("file").orEmpty()
+            val noteViewModel: NoteViewModel = viewModel(
+                key = file,
+                factory = viewModelFactory { initializer { NoteViewModel(container, file) } },
+            )
+            NoteScreen(viewModel = noteViewModel, onBackClick = { navController.popBackStack() })
         }
         composable(Routes.SETTINGS) {
-            SettingsScreen(settings = container.settings, updates = container.updates, exports = container.exports, recordings = container.recordings, versionName = versionName, onBackClick = { navController.popBackStack() })
+            SettingsScreen(settings = container.settings, updates = container.updates, exports = container.exports, recordings = container.recordings, versionName = versionName, provider = container.provider, onProcessingClick = { navController.navigate(Routes.PROVIDER) }, onBackClick = { navController.popBackStack() })
         }
     }
 }

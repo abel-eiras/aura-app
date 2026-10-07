@@ -13,11 +13,14 @@ import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.PauseCircle
 import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.StopCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,6 +47,9 @@ fun MainScreen(
     onToggleRecording: () -> Unit,
     onSettingsClick: () -> Unit,
     onRecordingsClick: () -> Unit,
+    showProcessingReminder: Boolean,
+    onSetupProcessing: () -> Unit,
+    onDismissReminder: () -> Unit,
 ) {
     val status by viewModel.status.collectAsStateWithLifecycle()
     val updateState by updates.state.collectAsStateWithLifecycle()
@@ -68,7 +74,22 @@ fun MainScreen(
                 status = status,
                 onToggleRecording = onToggleRecording,
                 onTogglePause = viewModel::togglePause,
+                onStop = viewModel::stopRecording,
             )
+            // A discreet offer to finish the setup that was skipped (HU-002-1, scenario 4).
+            if (showProcessingReminder && status is RecordingStatus.Idle) {
+                Card(modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 16.dp, top = 4.dp, bottom = 4.dp, end = 4.dp)) {
+                        Text(
+                            text = stringResource(R.string.reminder_processing),
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(1f),
+                        )
+                        TextButton(onClick = onSetupProcessing) { Text(stringResource(R.string.reminder_processing_action)) }
+                        TextButton(onClick = onDismissReminder) { Text(stringResource(R.string.reminder_processing_dismiss)) }
+                    }
+                }
+            }
         }
     }
 }
@@ -79,6 +100,7 @@ private fun MainContent(
     status: RecordingStatus,
     onToggleRecording: () -> Unit,
     onTogglePause: () -> Unit,
+    onStop: () -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -97,14 +119,23 @@ private fun MainContent(
         )
         if (status.isActive) {
             val paused = status is RecordingStatus.Paused
-            IconButton(onClick = onTogglePause, modifier = Modifier.padding(top = 16.dp)) {
-                Icon(
-                    imageVector = if (paused) Icons.Outlined.PlayCircle else Icons.Outlined.PauseCircle,
-                    contentDescription = stringResource(
-                        if (paused) R.string.content_description_resume else R.string.content_description_pause,
-                    ),
-                    modifier = Modifier.size(40.dp),
-                )
+            Row(modifier = Modifier.padding(top = 16.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                IconButton(onClick = onTogglePause) {
+                    Icon(
+                        imageVector = if (paused) Icons.Outlined.PlayCircle else Icons.Outlined.PauseCircle,
+                        contentDescription = stringResource(
+                            if (paused) R.string.content_description_resume else R.string.content_description_pause,
+                        ),
+                        modifier = Modifier.size(40.dp),
+                    )
+                }
+                IconButton(onClick = onStop) {
+                    Icon(
+                        imageVector = Icons.Outlined.StopCircle,
+                        contentDescription = stringResource(R.string.content_description_stop),
+                        modifier = Modifier.size(40.dp),
+                    )
+                }
             }
         }
     }

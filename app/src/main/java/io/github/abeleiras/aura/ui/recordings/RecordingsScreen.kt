@@ -42,6 +42,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.abeleiras.aura.R
 import io.github.abeleiras.aura.data.Recording
 import io.github.abeleiras.aura.domain.export.ExportStatus
+import io.github.abeleiras.aura.domain.processing.ErrorReason
+import io.github.abeleiras.aura.domain.processing.JobRecord
+import io.github.abeleiras.aura.domain.processing.JobStatus
 import io.github.abeleiras.aura.domain.recording.RecordingPolicy
 import io.github.abeleiras.aura.recording.PlaybackState
 import java.text.DateFormat
@@ -49,7 +52,7 @@ import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecordingsScreen(viewModel: RecordingsViewModel, onBackClick: () -> Unit) {
+fun RecordingsScreen(viewModel: RecordingsViewModel, onOpenNote: (String) -> Unit, onBackClick: () -> Unit) {
     val items by viewModel.items.collectAsStateWithLifecycle()
     val playback by viewModel.playback.collectAsStateWithLifecycle()
     var pendingDelete by remember { mutableStateOf<RecordingItem?>(null) }
@@ -82,6 +85,8 @@ fun RecordingsScreen(viewModel: RecordingsViewModel, onBackClick: () -> Unit) {
                 onPlayToggle = viewModel::togglePlayback,
                 onSeek = viewModel::seekTo,
                 onRetryExport = viewModel::retryExport,
+                onProcess = viewModel::process,
+                onOpenNote = onOpenNote,
                 onDelete = { pendingDelete = it },
                 modifier = Modifier.padding(padding),
             )
@@ -121,6 +126,8 @@ private fun RecordingsList(
     onPlayToggle: (Recording) -> Unit,
     onSeek: (Int) -> Unit,
     onRetryExport: () -> Unit,
+    onProcess: (Recording) -> Unit,
+    onOpenNote: (String) -> Unit,
     onDelete: (RecordingItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -152,6 +159,8 @@ private fun RecordingsList(
                 onPlayToggle = { onPlayToggle(item.recording) },
                 onSeek = onSeek,
                 onRetryExport = onRetryExport,
+                onProcess = { onProcess(item.recording) },
+                onOpenNote = { onOpenNote(item.recording.fileName) },
                 onDelete = { onDelete(item) },
             )
             HorizontalDivider()
@@ -166,6 +175,8 @@ private fun RecordingRow(
     onPlayToggle: () -> Unit,
     onSeek: (Int) -> Unit,
     onRetryExport: () -> Unit,
+    onProcess: () -> Unit,
+    onOpenNote: () -> Unit,
     onDelete: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -194,6 +205,21 @@ private fun RecordingRow(
                 exportLabel(item.exportStatus)?.let {
                     Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                 }
+                processingLabel(item.job)?.let {
+                    Text(
+                        it,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = if (item.job?.status == JobStatus.ERROR) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    )
+                }
+            }
+            val status = item.job?.status
+            when {
+                status == JobStatus.READY -> TextButton(onClick = onOpenNote) { Text(stringResource(R.string.processing_action_open)) }
+                item.canProcess && (status == null || status == JobStatus.ERROR) ->
+                    TextButton(onClick = onProcess) {
+                        Text(stringResource(if (status == JobStatus.ERROR) R.string.processing_action_retry else R.string.processing_action_process))
+                    }
             }
             if (item.exportStatus == ExportStatus.ERROR) {
                 TextButton(onClick = onRetryExport) { Text(stringResource(R.string.recordings_export_retry)) }
@@ -217,6 +243,32 @@ private fun RecordingRow(
                 Text(RecordingPolicy.formatDuration(playback.durationMillis.toLong()), style = MaterialTheme.typography.labelSmall)
             }
         }
+    }
+}
+
+@Composable
+internal fun processingLabel(job: JobRecord?): String? {
+    job ?: return null
+    return when (job.status) {
+        JobStatus.QUEUED -> stringResource(if (job.attempts > 0) R.string.processing_retrying else R.string.processing_queued)
+        JobStatus.WAITING_NETWORK -> stringResource(R.string.processing_waiting_network)
+        JobStatus.TRANSCRIBING -> stringResource(R.string.processing_transcribing)
+        JobStatus.DRAFTING -> stringResource(R.string.processing_drafting)
+        JobStatus.READY -> stringResource(R.string.processing_ready)
+        JobStatus.NO_CONTENT -> stringResource(R.string.processing_no_content)
+        JobStatus.ERROR -> stringResource(
+            when (job.error) {
+                ErrorReason.NETWORK -> R.string.processing_error_network
+                ErrorReason.RATE_LIMITED -> R.string.processing_error_rate_limited
+                ErrorReason.PROVIDER_UNAVAILABLE -> R.string.processing_error_unavailable
+                ErrorReason.INVALID_CREDENTIAL -> R.string.processing_error_credential
+                ErrorReason.QUOTA_EXHAUSTED -> R.string.processing_error_quota
+                ErrorReason.INSUFFICIENT_FUNDS -> R.string.processing_error_funds
+                ErrorReason.AUDIO_TOO_LONG -> R.string.processing_error_too_long
+                ErrorReason.INVALID_RESPONSE -> R.string.processing_error_invalid_response
+                ErrorReason.UNKNOWN, null -> R.string.processing_error_unknown
+            },
+        )
     }
 }
 

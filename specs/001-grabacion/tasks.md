@@ -30,6 +30,13 @@
 - [x] T001-15 Ajustes: calidad y versión (FR-001-04)
 - [x] T001-16 Cadenas es/gl/en
 
+## Fase 4b — Hallazgo de la prueba en un Pixel 10 Pro (0.2.0)
+
+Parar desde la app "no funcionaba": en realidad sí, tocando el círculo, pero **nada lo indicaba**
+(el círculo alterna y la pantalla solo mostraba Pausar). No era un fallo, sino de descubribilidad.
+
+- [x] T001-20 Botón "Parar y guardar" explícito junto a Pausar (HU-001-1, escenario 3)
+
 ## Fase 5 — Verificación
 
 - [x] T001-17 CI en verde (lint + compilación + tests del dominio)

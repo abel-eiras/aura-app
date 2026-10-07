@@ -4,6 +4,10 @@ import android.content.Context
 import android.util.Log
 import androidx.room.Room
 import io.github.abeleiras.aura.data.RecordingRepository
+import io.github.abeleiras.aura.data.ai.CredentialStore
+import io.github.abeleiras.aura.data.ai.ProviderController
+import io.github.abeleiras.aura.data.processing.FileProcessingStore
+import io.github.abeleiras.aura.data.processing.ProcessingRepository
 import io.github.abeleiras.aura.data.db.AuraDatabase
 import io.github.abeleiras.aura.data.export.ExportRepository
 import io.github.abeleiras.aura.data.update.UpdateController
@@ -41,7 +45,7 @@ class AppContainer(private val context: Context) {
         Room.databaseBuilder(context, AuraDatabase::class.java, "aura.db").build()
     }
 
-    val exports by lazy { ExportRepository(appContext, settings, recordings) }
+    val exports: ExportRepository by lazy { ExportRepository(appContext, settings, recordings, derivedFiles = { processing.exportFilesFor(it) }) }
 
     private val http by lazy {
         OkHttpClient.Builder()
@@ -50,6 +54,22 @@ class AppContainer(private val context: Context) {
             .connectTimeout(15, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
             .build()
+    }
+
+    val credentials by lazy { CredentialStore(appContext) }
+
+    val provider by lazy { ProviderController(settings, credentials, http, appScope) }
+
+    val processing: ProcessingRepository by lazy {
+        ProcessingRepository(
+            context = appContext,
+            store = FileProcessingStore(File(context.filesDir, "processing")),
+            recordings = recordings,
+            provider = provider,
+            settings = settings,
+            http = http,
+            afterDrafted = { exports.exportPending() },
+        )
     }
 
     val updates by lazy {

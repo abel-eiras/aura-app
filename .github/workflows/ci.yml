@@ -41,3 +41,43 @@ jobs:
           name: aura-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 7
+      # The release build (R8), signed with a throwaway key made right here: only so an emulator can
+      # install it. This key protects nothing and is never used for a real release.
+      - name: Sign the release APK for the smoke test
+        run: |
+          set -euo pipefail
+          keytool -genkeypair -keystore smoke.keystore -storepass android -keypass android -alias smoke \
+            -keyalg RSA -keysize 2048 -validity 2 -dname "CN=Aura CI smoke test"
+          apksigner="$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)"
+          "$apksigner" sign --ks smoke.keystore --ks-pass pass:android --key-pass pass:android \
+            --out smoke.apk "$(ls app/build/outputs/apk/release/*.apk | head -1)"
+      - name: Upload the APK for the smoke test
+        uses: actions/upload-artifact@v4
+        with:
+          name: aura-smoke-apk
+          path: smoke.apk
+          retention-days: 1
+
+  # Opens the release build on an emulator and checks it is still alive (T006-18).
+  smoke:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: aura-smoke-apk
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install, open and watch the app on an emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          script: bash scripts/smoke-test.sh smoke.apk

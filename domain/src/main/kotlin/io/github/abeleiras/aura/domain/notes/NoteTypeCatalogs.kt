@@ -19,11 +19,18 @@ object NoteTypeCatalogs {
     private val idPattern = Regex("^[a-z0-9_]+$")
     private val tagPattern = Regex("^[a-z0-9-]+$")
 
-    /** The three built-in types, read from the shared contract file (FR-005-01). */
-    fun defaults(): NoteTypeCatalog {
-        val stream = checkNotNull(NoteTypeCatalogs::class.java.getResourceAsStream("/contracts/categorias.default.json")) {
-            "categorias.default.json missing from resources"
-        }
+    /** Languages the built-in types are translated into; Spanish is the base (FR-005-01). */
+    private val translated = setOf("en", "gl")
+
+    /**
+     * The three built-in types read from the shared contract files, in [language] (`es`, `gl` or `en`;
+     * anything else falls back to Spanish). Ids, tags and the default flag are identical in every language,
+     * so switching language never changes which type a note belongs to.
+     */
+    fun defaults(language: String = "es"): NoteTypeCatalog {
+        val suffix = if (language in translated) ".$language" else ""
+        val path = "/contracts/categorias.default$suffix.json"
+        val stream = checkNotNull(NoteTypeCatalogs::class.java.getResourceAsStream(path)) { "$path missing from resources" }
         val text = stream.use { it.readBytes().toString(Charsets.UTF_8) }
         return (parse(text) as CatalogParseResult.Valid).catalog
     }

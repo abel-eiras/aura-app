@@ -178,6 +178,9 @@ Ajustes, para tener el control.
 
 ## Preguntas abiertas
 
+> Hallazgos preliminares (sin verificar) en `docs/spikes/proveedores-ia.md`: para OpenRouter apunta a un
+> *callback* en `http://localhost:<puerto>/callback`, no a un esquema propio.
+
 - ¿Acepta OpenRouter un esquema propio (`aura://`) como `callback_url` del
   PKCE, o exige `https`? Si exige `https`, haría falta una página puente en
   GitHub Pages y App Links. Se resuelve con un spike al inicio del plan.

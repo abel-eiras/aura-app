@@ -19,6 +19,8 @@ kotlin {
 // como recursos para que el código y los tests lean exactamente el mismo fichero.
 val syncContracts by tasks.registering(Copy::class) {
     from(rootProject.file("specs/005-tipos-de-nota/contracts/categorias.default.json"))
+    from(rootProject.file("specs/005-tipos-de-nota/contracts/categorias.default.en.json"))
+    from(rootProject.file("specs/005-tipos-de-nota/contracts/categorias.default.gl.json"))
     from(rootProject.file("specs/005-tipos-de-nota/contracts/categorias.schema.json"))
     from(rootProject.file("specs/003-procesado-ia/contracts/transcripcion.schema.json"))
     into(layout.buildDirectory.dir("generated/contracts/contracts"))
