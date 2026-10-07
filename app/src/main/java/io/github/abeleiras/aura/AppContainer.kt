@@ -12,6 +12,7 @@ import io.github.abeleiras.aura.recording.PlaybackController
 import io.github.abeleiras.aura.domain.recording.RecordingStatus
 import io.github.abeleiras.aura.domain.update.ApkDownloader
 import io.github.abeleiras.aura.domain.update.ReleasesClient
+import io.github.abeleiras.aura.domain.update.RuntimeExceptionsAsIoException
 import io.github.abeleiras.aura.recording.RecordingStateHolder
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
@@ -44,6 +45,8 @@ class AppContainer(private val context: Context) {
 
     private val http by lazy {
         OkHttpClient.Builder()
+            // First, so no unexpected runtime exception can escape OkHttp's threads and kill the app.
+            .addInterceptor(RuntimeExceptionsAsIoException)
             .connectTimeout(15, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
             .build()

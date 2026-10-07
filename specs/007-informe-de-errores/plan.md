@@ -31,6 +31,14 @@ fallar cuando algo ya ha ido mal.
 - `AuraApplication.onCreate` no arranca trabajo de fondo en el proceso `:crash`.
 - `AppContainer.appScope` lleva un `CoroutineExceptionHandler` que registra con `Log.e` (FR-007-05); `UpdateController.check` captura `Exception` (menos cancelación) (FR-007-06).
 
+## Origen
+
+Primer uso real: el log del Pixel mostró `SecurityException: Permission denied (missing INTERNET
+permission?)` en el hilo `Dispatcher` de OkHttp. OkHttp relanza las excepciones inesperadas en su
+propio hilo tras avisar al callback, así que un `CoroutineExceptionHandler` no basta: el cliente HTTP
+de la app lleva `RuntimeExceptionsAsIoException` como primer interceptor, y `HttpSafetyTest` lo
+comprueba (incluida una prueba de control sin el interceptor).
+
 ## Trazabilidad
 
 | Requisito | Componente | Test |

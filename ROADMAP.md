@@ -28,6 +28,9 @@ funciones.
       solo audio) → el autor ya puede sustituir Aura + Drive por
       aura-app + Syncthing + aura-transcribe. *Código listo y CI en verde; falta la prueba manual con Syncthing (T004-13/14).*
 
+- [ ] **Prueba de humo en CI con emulador** (T006-18): la 0.1.0 se publicó sin que nadie
+      la hubiera ejecutado y se cerraba al abrir (faltaba `INTERNET`).
+
 ## Hito 2 — Notas con IA (v0.5.0)
 
 - [ ] Spikes: callback PKCE de OpenRouter; límites de audio en OpenRouter;
