@@ -54,6 +54,7 @@ class NoteViewModel(private val container: AppContainer, fileName: String) : Vie
         viewModelScope.launch(Dispatchers.IO) {
             val renamed = Speakers.rename(current.transcript, speaker, name)
             store.saveTranscript(id, renamed)
+            container.appScope.launch { container.exports.exportPending() } // names changed: refresh the exported files
             _state.value = NoteScreenState.Ready(current.copy(transcript = renamed))
         }
     }

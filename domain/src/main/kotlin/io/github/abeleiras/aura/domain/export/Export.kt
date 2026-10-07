@@ -54,4 +54,8 @@ object ExportNaming {
     const val PARTIAL_SUFFIX = ".part"
 
     fun isPartial(name: String): Boolean = name.endsWith(PARTIAL_SUFFIX)
+
+    /** Hex SHA-256: the exporter writes a transcript or note again only when this differs from the last export. */
+    fun contentHash(content: ByteArray): String =
+        java.security.MessageDigest.getInstance("SHA-256").digest(content).joinToString("") { "%02x".format(it) }
 }

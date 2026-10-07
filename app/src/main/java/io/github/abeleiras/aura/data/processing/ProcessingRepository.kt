@@ -19,10 +19,13 @@ import androidx.work.workDataOf
 import io.github.abeleiras.aura.MainActivity
 import io.github.abeleiras.aura.R
 import io.github.abeleiras.aura.container
+import io.github.abeleiras.aura.data.Recording
 import io.github.abeleiras.aura.data.RecordingRepository
+import io.github.abeleiras.aura.data.export.ExportFile
 import io.github.abeleiras.aura.data.ai.ProviderController
 import io.github.abeleiras.aura.data.prefs.AppSettings
 import io.github.abeleiras.aura.domain.ai.GeminiProvider
+import io.github.abeleiras.aura.domain.notes.NoteRenderer
 import io.github.abeleiras.aura.domain.notes.NoteType
 import io.github.abeleiras.aura.domain.notes.NoteTypeCatalogs
 import io.github.abeleiras.aura.domain.processing.ErrorReason
@@ -33,13 +36,17 @@ import io.github.abeleiras.aura.domain.processing.ProcessingInput
 import io.github.abeleiras.aura.domain.processing.ProcessingOutcome
 import io.github.abeleiras.aura.domain.processing.ProcessingPipeline
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
+import java.text.SimpleDateFormat
 import java.time.Instant
+import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -55,6 +62,8 @@ class ProcessingRepository(
     private val provider: ProviderController,
     private val settings: AppSettings,
     private val http: OkHttpClient,
+    /** Runs after a note was drafted so transcript and note reach the export folder (spec 004). */
+    private val afterDrafted: suspend () -> Unit = {},
 ) {
     private val _jobs = MutableStateFlow(store.loadAllJobs())
     val jobs: StateFlow<Map<String, JobRecord>> = _jobs.asStateFlow()
@@ -130,7 +139,10 @@ class ProcessingRepository(
             store.saveJob(id, JobRecord(JobStatus.ERROR, error = ErrorReason.UNKNOWN, message = e.javaClass.simpleName, updatedAt = Instant.now().toString()))
             ProcessingOutcome.Finished(JobStatus.ERROR, ErrorReason.UNKNOWN)
         }
-        if (outcome is ProcessingOutcome.Finished && outcome.status == JobStatus.READY) notifyReady(recording.fileName, recording.startedAtMillis, id)
+        if (outcome is ProcessingOutcome.Finished && outcome.status != JobStatus.ERROR) {
+            if (outcome.status == JobStatus.READY) notifyReady(recording.fileName, recording.startedAtMillis, id)
+            afterDrafted()
+        }
         outcome
     }
 
@@ -161,6 +173,29 @@ class ProcessingRepository(
                 .setAutoCancel(true)
                 .build(),
         )
+    }
+
+    /** Transcript and note as files for the export folder, laid out like aura-transcribe's output (FR-004-08). */
+    suspend fun exportFilesFor(recording: Recording): List<ExportFile> = withContext(Dispatchers.IO) {
+        val id = idOf(recording.fileName)
+        val transcript = store.loadTranscript(id) ?: return@withContext emptyList()
+        val stem = id
+        val files = mutableListOf(
+            ExportFile(listOf("transcription"), "$stem.json", "application/json", transcript.toJson().toByteArray(Charsets.UTF_8)),
+        )
+        val stored = store.loadNote(id)
+        val type = stored?.let { typeById(it.typeId) }
+        if (stored != null && type != null) {
+            val date = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date(recording.startedAtMillis))
+            val markdown = NoteRenderer.render(
+                type, date, transcript, stored.body,
+                generatedBy = "aura-app ${versionName()}",
+                genericSpeaker = context.getString(R.string.speaker_generic),
+            )
+            val path = NoteRenderer.exportPaths(recording.fileName, type, date).note.split('/')
+            files += ExportFile(path.dropLast(1), path.last(), "text/markdown", markdown.toByteArray(Charsets.UTF_8))
+        }
+        files
     }
 
     /** Looks the type up in every language's built-ins: a note keeps its type id whatever language the UI uses now. */

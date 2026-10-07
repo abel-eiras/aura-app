@@ -8,7 +8,7 @@
 - [x] T004-05 Carpeta de exportación con SAF: elegir, permiso persistente, escribir audio (FR-004-07, 08) — hito 1
 - [x] T004-06a Escritura con `.part` + renombrado, reintentos y estado pendiente/error derivado (FR-004-09)
 - [ ] T004-06b Estado de exportación por transcripción y nota en Room, con migración y tests (con 003)
-- [ ] T004-07 Exportar transcripción y nota; mover al cambiar de tipo
+- [~] T004-07 Exportar transcripción y nota a `transcription/` y `notas/<carpeta>/` (hash por ruta en preferencias; se reescribe solo si cambia); falta mover al cambiar de tipo (aún no hay cambio de tipo)
 - [~] T004-08 Vista de nota: resumen, transcripción por hablante (FR-004-01); falta el reproductor por segmento y el Markdown completo
 - [~] T004-09 UI de hablantes: renombrar hecho; falta unir (FR-004-02)
 - [ ] T004-10 Búsqueda y filtros en la lista (FR-004-04)

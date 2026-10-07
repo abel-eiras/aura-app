@@ -40,6 +40,11 @@ data class ExportState(
         ExportPolicy.status(folderConfigured, recording.fileName, recording.startedAtMillis, exportFromMillis, exported, failed)
 }
 
+/** A text artifact derived from a recording (transcript, note) and where it goes under the export folder (FR-004-08). */
+class ExportFile(val directories: List<String>, val name: String, val mimeType: String, val content: ByteArray) {
+    val path: String get() = (directories + name).joinToString("/")
+}
+
 /**
  * Copies recordings to a folder the user picked with the system picker (Storage Access
  * Framework), so Syncthing, Obsidian or aura-transcribe can take them from there
@@ -49,6 +54,8 @@ class ExportRepository(
     private val context: Context,
     private val settings: AppSettings,
     private val recordings: RecordingRepository,
+    /** Transcript and note files of a recording, empty until it has been processed. Evaluated lazily (no init cycle). */
+    private val derivedFiles: suspend (Recording) -> List<ExportFile> = { emptyList() },
 ) {
     private val resolver: ContentResolver get() = context.contentResolver
     private val mutex = Mutex()
@@ -116,6 +123,7 @@ class ExportRepository(
                         _state.value = _state.value.copy(failed = _state.value.failed + recording.fileName)
                     }
                 }
+                exportDerived(tree, start.exportFromMillis)
             } finally {
                 // NonCancellable: `running` must go back to false even if the caller was cancelled.
                 withContext(NonCancellable) {
@@ -123,6 +131,69 @@ class ExportRepository(
                 }
             }
         }
+    }
+
+    /**
+     * Transcripts and notes go to `transcription/` and `notas/<type folder>/` like aura-transcribe's output (FR-004-08).
+     * Unlike audio they change (speakers renamed, note redrafted), so the ledger keeps a hash per path and a file is
+     * written again only when its content differs from what was last exported.
+     */
+    private suspend fun exportDerived(tree: Uri, exportFromMillis: Long) {
+        val ledger = settings.exportedDerived.toMutableMap()
+        for (recording in recordings.all().filter { it.startedAtMillis >= exportFromMillis }) {
+            val files = try {
+                derivedFiles(recording)
+            } catch (e: Exception) {
+                Log.w(TAG, "Could not prepare the files of ${recording.fileName}", e)
+                continue
+            }
+            for (file in files) {
+                val hash = ExportNaming.contentHash(file.content)
+                if (ledger[file.path] == hash) continue
+                try {
+                    withContext(Dispatchers.IO) { writeReplacing(tree, file) }
+                    settings.setExportedDerived(file.path, hash)
+                    ledger[file.path] = hash
+                } catch (e: SecurityException) {
+                    _state.value = _state.value.copy(permissionLost = true)
+                    return
+                } catch (e: Exception) {
+                    Log.w(TAG, "Could not export ${file.path}", e)
+                }
+            }
+        }
+    }
+
+    /** Creates the folders on the way, writes `<name>.part`, removes the previous version and renames. */
+    private fun writeReplacing(tree: Uri, file: ExportFile) {
+        var parentId = DocumentsContract.getTreeDocumentId(tree)
+        for (dir in file.directories) parentId = ensureDirectory(tree, parentId, dir)
+        val parent = DocumentsContract.buildDocumentUriUsingTree(tree, parentId)
+        val existing = listChildren(tree, parentId)
+
+        existing[file.name + ExportNaming.PARTIAL_SUFFIX]?.let { stale ->
+            runCatching { DocumentsContract.deleteDocument(resolver, DocumentsContract.buildDocumentUriUsingTree(tree, stale.documentId)) }
+        }
+        val part = DocumentsContract.createDocument(resolver, parent, "application/octet-stream", file.name + ExportNaming.PARTIAL_SUFFIX)
+            ?: throw IOException("The folder refused a new file")
+        try {
+            resolver.openOutputStream(part, "wt")?.use { it.write(file.content) } ?: throw IOException("No output stream")
+            existing[file.name]?.let { old ->
+                DocumentsContract.deleteDocument(resolver, DocumentsContract.buildDocumentUriUsingTree(tree, old.documentId))
+            }
+            if (DocumentsContract.renameDocument(resolver, part, file.name) == null) throw IOException("The folder can't rename files")
+        } catch (e: Exception) {
+            runCatching { DocumentsContract.deleteDocument(resolver, part) }
+            throw e
+        }
+    }
+
+    private fun ensureDirectory(tree: Uri, parentId: String, name: String): String {
+        listChildren(tree, parentId)[name]?.let { if (it.isDirectory) return it.documentId }
+        val parent = DocumentsContract.buildDocumentUriUsingTree(tree, parentId)
+        val created = DocumentsContract.createDocument(resolver, parent, DocumentsContract.Document.MIME_TYPE_DIR, name)
+            ?: throw IOException("The folder refused a new folder")
+        return DocumentsContract.getDocumentId(created)
     }
 
     /** A deleted recording leaves the ledger; the exported copy is the user's and stays (FR-004-10). */
@@ -172,7 +243,7 @@ class ExportRepository(
         null
     }
 
-    private class Child(val documentId: String, val size: Long)
+    private class Child(val documentId: String, val size: Long, val isDirectory: Boolean)
 
     private fun listChildren(tree: Uri, treeDocumentId: String): Map<String, Child> {
         val children = DocumentsContract.buildChildDocumentsUriUsingTree(tree, treeDocumentId)
@@ -180,10 +251,15 @@ class ExportRepository(
             DocumentsContract.Document.COLUMN_DOCUMENT_ID,
             DocumentsContract.Document.COLUMN_DISPLAY_NAME,
             DocumentsContract.Document.COLUMN_SIZE,
+            DocumentsContract.Document.COLUMN_MIME_TYPE,
         )
         val result = linkedMapOf<String, Child>()
         resolver.query(children, columns, null, null, null)?.use { c ->
-            while (c.moveToNext()) result[c.getString(1)] = Child(c.getString(0), if (c.isNull(2)) -1L else c.getLong(2))
+            while (c.moveToNext()) result[c.getString(1)] = Child(
+                c.getString(0),
+                if (c.isNull(2)) -1L else c.getLong(2),
+                c.getString(3) == DocumentsContract.Document.MIME_TYPE_DIR,
+            )
         } ?: throw IOException("The folder can't be listed")
         return result
     }

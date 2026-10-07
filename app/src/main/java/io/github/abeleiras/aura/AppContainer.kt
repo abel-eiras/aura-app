@@ -45,7 +45,7 @@ class AppContainer(private val context: Context) {
         Room.databaseBuilder(context, AuraDatabase::class.java, "aura.db").build()
     }
 
-    val exports by lazy { ExportRepository(appContext, settings, recordings) }
+    val exports by lazy { ExportRepository(appContext, settings, recordings, derivedFiles = { processing.exportFilesFor(it) }) }
 
     private val http by lazy {
         OkHttpClient.Builder()
@@ -68,6 +68,7 @@ class AppContainer(private val context: Context) {
             provider = provider,
             settings = settings,
             http = http,
+            afterDrafted = { exports.exportPending() },
         )
     }
 

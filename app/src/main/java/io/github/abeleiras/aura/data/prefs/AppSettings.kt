@@ -56,6 +56,18 @@ class AppSettings(context: Context) {
     val exportedFiles: Set<String>
         get() = prefs.getStringSet(KEY_EXPORTED, null)?.toSet() ?: emptySet()
 
+    /** Exported transcripts and notes: relative path -> hash of the content last written there. */
+    val exportedDerived: Map<String, String>
+        get() = (prefs.getStringSet(KEY_EXPORTED_DERIVED, null) ?: emptySet())
+            .mapNotNull { entry -> entry.substringBefore('\t', "").takeIf { it.isNotEmpty() }?.let { it to entry.substringAfter('\t') } }
+            .toMap()
+
+    @Synchronized
+    fun setExportedDerived(path: String, hash: String) {
+        val others = (prefs.getStringSet(KEY_EXPORTED_DERIVED, null) ?: emptySet()).filterNot { it.startsWith("$path\t") }
+        prefs.edit { putStringSet(KEY_EXPORTED_DERIVED, (others + "$path\t$hash").toSet()) }
+    }
+
     @Synchronized
     fun addExported(fileName: String) = prefs.edit { putStringSet(KEY_EXPORTED, exportedFiles + fileName) }
 
@@ -125,6 +137,7 @@ class AppSettings(context: Context) {
         const val KEY_EXPORT_FOLDER = "export_folder_uri"
         const val KEY_EXPORT_FROM = "export_from_millis"
         const val KEY_EXPORTED = "exported_files"
+        const val KEY_EXPORTED_DERIVED = "exported_derived"
 
         const val KEY_AUTO_UPDATE = "auto_update_check"
         const val KEY_PRE_RELEASES = "include_pre_releases"
