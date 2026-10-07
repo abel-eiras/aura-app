@@ -6,6 +6,8 @@ import androidx.room.Room
 import io.github.abeleiras.aura.data.RecordingRepository
 import io.github.abeleiras.aura.data.ai.CredentialStore
 import io.github.abeleiras.aura.data.ai.ProviderController
+import io.github.abeleiras.aura.data.processing.FileProcessingStore
+import io.github.abeleiras.aura.data.processing.ProcessingRepository
 import io.github.abeleiras.aura.data.db.AuraDatabase
 import io.github.abeleiras.aura.data.export.ExportRepository
 import io.github.abeleiras.aura.data.update.UpdateController
@@ -57,6 +59,17 @@ class AppContainer(private val context: Context) {
     val credentials by lazy { CredentialStore(appContext) }
 
     val provider by lazy { ProviderController(settings, credentials, http, appScope) }
+
+    val processing by lazy {
+        ProcessingRepository(
+            context = appContext,
+            store = FileProcessingStore(File(context.filesDir, "processing")),
+            recordings = recordings,
+            provider = provider,
+            settings = settings,
+            http = http,
+        )
+    }
 
     val updates by lazy {
         val releases = ReleasesClient(http)

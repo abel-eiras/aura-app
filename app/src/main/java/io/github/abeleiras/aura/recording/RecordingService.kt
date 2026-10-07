@@ -168,6 +168,7 @@ class RecordingService : Service() {
             else -> container.appScope.launch {
                 try {
                     container.recordings.register(file, startedAtMillis, durationMillis, quality)
+                    container.processing.onRecordingRegistered(file.name)
                 } catch (e: Exception) {
                     // The audio is on disk; recoverOrphans() will list it on the next start.
                     Log.e(TAG, "Could not register ${file.name}", e)

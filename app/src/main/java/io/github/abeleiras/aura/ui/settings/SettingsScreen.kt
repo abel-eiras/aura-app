@@ -64,6 +64,8 @@ fun SettingsScreen(
     onBackClick: () -> Unit,
 ) {
     var quality by remember { mutableStateOf(settings.audioQuality) }
+    var autoProcess by remember { mutableStateOf(settings.autoProcess) }
+    var notifyReady by remember { mutableStateOf(settings.notifyWhenReady) }
     var autoCheck by remember { mutableStateOf(settings.autoUpdateCheck) }
     var preReleases by remember { mutableStateOf(settings.includePreReleases) }
     val providerState by provider.state.collectAsStateWithLifecycle()
@@ -115,6 +117,16 @@ fun SettingsScreen(
             )
             OutlinedButton(onClick = onProcessingClick, modifier = Modifier.padding(top = 8.dp)) {
                 Text(stringResource(R.string.settings_processing_configure))
+            }
+            if (providerState.mode != ProcessingMode.NONE) {
+                SwitchRow(R.string.settings_auto_process, autoProcess) {
+                    autoProcess = it
+                    settings.autoProcess = it
+                }
+                SwitchRow(R.string.settings_notify_ready, notifyReady) {
+                    notifyReady = it
+                    settings.notifyWhenReady = it
+                }
             }
             Text(
                 stringResource(R.string.settings_audio_quality_section),

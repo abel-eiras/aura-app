@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.core.content.edit
 import io.github.abeleiras.aura.domain.ai.CredentialState
 import io.github.abeleiras.aura.domain.ai.ProcessingMode
+import io.github.abeleiras.aura.domain.ai.ProviderDefaults
 import io.github.abeleiras.aura.domain.recording.AudioQuality
 
 /** Non-sensitive preferences. Credentials live in [io.github.abeleiras.aura.data.ai.CredentialStore] (FR-002-05). */
@@ -91,7 +92,29 @@ class AppSettings(context: Context) {
         get() = prefs.getString(KEY_LANG_SECONDARY, null)
         set(value) = prefs.edit { if (value == null) remove(KEY_LANG_SECONDARY) else putString(KEY_LANG_SECONDARY, value) }
 
+    /** FR-003-12: process each recording when it is saved, if a provider is ready. */
+    var autoProcess: Boolean
+        get() = prefs.getBoolean(KEY_AUTO_PROCESS, true)
+        set(value) = prefs.edit { putBoolean(KEY_AUTO_PROCESS, value) }
+
+    /** FR-003-10: notification when a note is ready and the app is in the background. */
+    var notifyWhenReady: Boolean
+        get() = prefs.getBoolean(KEY_NOTIFY_READY, true)
+        set(value) = prefs.edit { putBoolean(KEY_NOTIFY_READY, value) }
+
+    var transcribeModel: String
+        get() = prefs.getString(KEY_MODEL_TRANSCRIBE, null) ?: ProviderDefaults.GEMINI_TRANSCRIBE_MODEL
+        set(value) = prefs.edit { putString(KEY_MODEL_TRANSCRIBE, value) }
+
+    var draftModel: String
+        get() = prefs.getString(KEY_MODEL_DRAFT, null) ?: ProviderDefaults.GEMINI_DRAFT_MODEL
+        set(value) = prefs.edit { putString(KEY_MODEL_DRAFT, value) }
+
     private companion object {
+        const val KEY_AUTO_PROCESS = "auto_process"
+        const val KEY_NOTIFY_READY = "notify_when_ready"
+        const val KEY_MODEL_TRANSCRIBE = "model_transcribe"
+        const val KEY_MODEL_DRAFT = "model_draft"
         const val KEY_ONBOARDING_DONE = "onboarding_done"
         const val KEY_MODE = "processing_mode"
         const val KEY_CREDENTIAL_STATE = "credential_state"
