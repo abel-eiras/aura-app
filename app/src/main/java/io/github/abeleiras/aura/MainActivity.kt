@@ -22,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.launch
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -135,6 +136,8 @@ private fun AuraApp(versionName: String) {
     // Back from the "install unknown apps" settings page: carry on with the update.
     LifecycleResumeEffect(Unit) {
         container.updates.onResumed()
+        // Back in the foreground: retry exports that were waiting for the folder (spec 004, scenario 4).
+        container.appScope.launch { container.exports.exportPending() }
         onPauseOrDispose { }
     }
 
@@ -152,7 +155,7 @@ private fun AuraApp(versionName: String) {
             RecordingsScreen(viewModel = recordingsViewModel, onBackClick = { navController.popBackStack() })
         }
         composable(Routes.SETTINGS) {
-            SettingsScreen(settings = container.settings, updates = container.updates, versionName = versionName, onBackClick = { navController.popBackStack() })
+            SettingsScreen(settings = container.settings, updates = container.updates, exports = container.exports, recordings = container.recordings, versionName = versionName, onBackClick = { navController.popBackStack() })
         }
     }
 }

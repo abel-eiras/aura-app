@@ -82,4 +82,27 @@
     <string name="settings_update_auto">Buscar actualizacións automaticamente (unha vez ao día)</string>
     <string name="settings_update_pre_releases">Recibir versións de proba</string>
     <string name="settings_update_check_now">Buscar actualizacións</string>
+    <string name="settings_export_section">Exportación</string>
+    <string name="settings_export_description">Aura copia cada gravación nova a un cartafol que elixas, para que apps como Syncthing ou Obsidian poidan recollela. Borrar unha gravación en Aura nunca borra a copia exportada.</string>
+    <string name="settings_export_folder_none">Ningún cartafol elixido</string>
+    <string name="settings_export_folder_current">Exportando a: %1$s</string>
+    <string name="settings_export_folder_unnamed">(cartafol)</string>
+    <string name="settings_export_permission_lost">Aura xa non pode escribir nese cartafol. Elíxeo de novo.</string>
+    <string name="settings_export_running">Exportando…</string>
+    <string name="settings_export_choose">Elixir cartafol</string>
+    <string name="settings_export_change">Cambiar cartafol</string>
+    <string name="settings_export_stop">Deixar de exportar</string>
+    <string name="settings_export_retry">Tentar de novo agora</string>
+    <string name="settings_export_all">Exportar todas as gravacións</string>
+    <string name="export_existing_title">¿Exportar as gravacións que xa tes?</string>
+    <string name="export_existing_body">Xa tes %1$d gravacións. ¿Cópiámolas tamén ao cartafol, ou só exportamos as novas a partir de agora?</string>
+    <string name="export_existing_yes">Exportar todas</string>
+    <string name="export_existing_no">Só as novas</string>
+    <string name="recordings_export_exported">Exportada</string>
+    <string name="recordings_export_pending">Pendente de exportar</string>
+    <string name="recordings_export_failed">Erro ao exportar</string>
+    <string name="recordings_export_retry">Tentar de novo</string>
+    <string name="recordings_delete_confirm_body_exported">A gravación eliminarase deste teléfono e non se poderá recuperar. A copia xa exportada ao teu cartafol non se borra.</string>
+    <string name="content_description_share_recording">Compartir gravación</string>
+    <string name="share_chooser_title">Compartir gravación</string>
 </resources>

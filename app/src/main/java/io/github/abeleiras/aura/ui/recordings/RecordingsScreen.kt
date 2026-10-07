@@ -15,6 +15,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Pause
 import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.abeleiras.aura.R
 import io.github.abeleiras.aura.data.Recording
+import io.github.abeleiras.aura.domain.export.ExportStatus
 import io.github.abeleiras.aura.domain.recording.RecordingPolicy
 import io.github.abeleiras.aura.recording.PlaybackState
 import java.text.DateFormat
@@ -48,9 +50,9 @@ import java.util.Date
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecordingsScreen(viewModel: RecordingsViewModel, onBackClick: () -> Unit) {
-    val recordings by viewModel.recordings.collectAsStateWithLifecycle()
+    val items by viewModel.items.collectAsStateWithLifecycle()
     val playback by viewModel.playback.collectAsStateWithLifecycle()
-    var pendingDelete by remember { mutableStateOf<Recording?>(null) }
+    var pendingDelete by remember { mutableStateOf<RecordingItem?>(null) }
 
     Scaffold(
         topBar = {
@@ -64,7 +66,7 @@ fun RecordingsScreen(viewModel: RecordingsViewModel, onBackClick: () -> Unit) {
             )
         },
     ) { padding ->
-        val list = recordings
+        val list = items
         when {
             list == null -> Box(Modifier.fillMaxSize().padding(padding))
             list.isEmpty() -> Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
@@ -75,24 +77,35 @@ fun RecordingsScreen(viewModel: RecordingsViewModel, onBackClick: () -> Unit) {
                 )
             }
             else -> RecordingsList(
-                recordings = list,
+                items = list,
                 playback = playback,
                 onPlayToggle = viewModel::togglePlayback,
                 onSeek = viewModel::seekTo,
+                onRetryExport = viewModel::retryExport,
                 onDelete = { pendingDelete = it },
                 modifier = Modifier.padding(padding),
             )
         }
     }
 
-    pendingDelete?.let { recording ->
+    pendingDelete?.let { item ->
         AlertDialog(
             onDismissRequest = { pendingDelete = null },
             title = { Text(stringResource(R.string.recordings_delete_confirm_title)) },
-            text = { Text(stringResource(R.string.recordings_delete_confirm_body)) },
+            text = {
+                Text(
+                    stringResource(
+                        if (item.exportStatus == ExportStatus.EXPORTED) {
+                            R.string.recordings_delete_confirm_body_exported
+                        } else {
+                            R.string.recordings_delete_confirm_body
+                        },
+                    ),
+                )
+            },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.delete(recording)
+                    viewModel.delete(item.recording)
                     pendingDelete = null
                 }) { Text(stringResource(R.string.recordings_delete)) }
             },
@@ -103,20 +116,21 @@ fun RecordingsScreen(viewModel: RecordingsViewModel, onBackClick: () -> Unit) {
 
 @Composable
 private fun RecordingsList(
-    recordings: List<Recording>,
+    items: List<RecordingItem>,
     playback: PlaybackState,
     onPlayToggle: (Recording) -> Unit,
     onSeek: (Int) -> Unit,
-    onDelete: (Recording) -> Unit,
+    onRetryExport: () -> Unit,
+    onDelete: (RecordingItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val totalBytes = recordings.sumOf { it.sizeBytes }
+    val totalBytes = items.sumOf { it.recording.sizeBytes }
     LazyColumn(modifier = modifier.fillMaxSize()) {
         item {
             Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                 Text(
-                    text = stringResource(R.string.recordings_total, recordings.size, Formatter.formatShortFileSize(context, totalBytes)),
+                    text = stringResource(R.string.recordings_total, items.size, Formatter.formatShortFileSize(context, totalBytes)),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 )
@@ -131,13 +145,14 @@ private fun RecordingsList(
                 }
             }
         }
-        items(recordings, key = { it.fileName }) { recording ->
+        items(items, key = { it.recording.fileName }) { item ->
             RecordingRow(
-                recording = recording,
-                playback = playback.takeIf { it.fileName == recording.fileName },
-                onPlayToggle = { onPlayToggle(recording) },
+                item = item,
+                playback = playback.takeIf { it.fileName == item.recording.fileName },
+                onPlayToggle = { onPlayToggle(item.recording) },
                 onSeek = onSeek,
-                onDelete = { onDelete(recording) },
+                onRetryExport = onRetryExport,
+                onDelete = { onDelete(item) },
             )
             HorizontalDivider()
         }
@@ -146,13 +161,15 @@ private fun RecordingsList(
 
 @Composable
 private fun RecordingRow(
-    recording: Recording,
+    item: RecordingItem,
     playback: PlaybackState?,
     onPlayToggle: () -> Unit,
     onSeek: (Int) -> Unit,
+    onRetryExport: () -> Unit,
     onDelete: () -> Unit,
 ) {
     val context = LocalContext.current
+    val recording = item.recording
     val isPlaying = playback?.isPlaying == true
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
@@ -174,6 +191,15 @@ private fun RecordingRow(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 )
+                exportLabel(item.exportStatus)?.let {
+                    Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                }
+            }
+            if (item.exportStatus == ExportStatus.ERROR) {
+                TextButton(onClick = onRetryExport) { Text(stringResource(R.string.recordings_export_retry)) }
+            }
+            IconButton(onClick = { shareRecording(context, recording) }) {
+                Icon(Icons.Outlined.Share, contentDescription = stringResource(R.string.content_description_share_recording))
             }
             IconButton(onClick = onDelete) {
                 Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.content_description_delete_recording))
@@ -192,4 +218,12 @@ private fun RecordingRow(
             }
         }
     }
+}
+
+@Composable
+private fun exportLabel(status: ExportStatus): String? = when (status) {
+    ExportStatus.NONE -> null
+    ExportStatus.PENDING -> stringResource(R.string.recordings_export_pending)
+    ExportStatus.ERROR -> stringResource(R.string.recordings_export_failed)
+    ExportStatus.EXPORTED -> stringResource(R.string.recordings_export_exported)
 }

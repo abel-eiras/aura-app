@@ -15,7 +15,7 @@ funciones.
 - [x] Módulo `:domain` en Kotlin puro con la lógica de 003/004/005/006 y sus
       tests (ADR-0007).
 - [x] CI en PRs.
-- [ ] Clave de firma de release generada y custodiada (**autor**); `docs/releases.md` escrito.
+- [x] Clave de firma de release generada y custodiada; `docs/releases.md` escrito. **`v0.1.0` publicada.**
 - [x] Workflow de release con etiqueta (FR-006-01…03).
 - [ ] Spike: estado de la verificación de desarrolladores de Android → ADR.
 
@@ -24,9 +24,9 @@ funciones.
 - [x] **001 Grabación** completa (portada de Aura, sin Drive). *Código listo y CI en verde; falta la prueba manual en móvil (T001-18).*
 - [x] **006** Comprobación de versión + actualización con un toque
       (FR-006-04…08). *Código listo y CI en verde; falta probar 0.1.0 → 0.2.0 en un móvil (T006-16).* A partir de aquí, los amigos-testers se actualizan solos.
-- [ ] **004** HU-004-3 (compartir audio) y HU-004-5 (carpeta de exportación,
+- [x] **004** HU-004-3 (compartir audio) y HU-004-5 (carpeta de exportación,
       solo audio) → el autor ya puede sustituir Aura + Drive por
-      aura-app + Syncthing + aura-transcribe.
+      aura-app + Syncthing + aura-transcribe. *Código listo y CI en verde; falta la prueba manual con Syncthing (T004-13/14).*
 
 ## Hito 2 — Notas con IA (v0.5.0)
 

@@ -39,7 +39,31 @@ class AppSettings(context: Context) {
         get() = prefs.getString(KEY_DISMISSED_UPDATE, null)
         set(value) = prefs.edit { putString(KEY_DISMISSED_UPDATE, value) }
 
+    /** `content://` tree URI of the export folder chosen with the system picker (spec 004), or null. */
+    var exportFolderUri: String?
+        get() = prefs.getString(KEY_EXPORT_FOLDER, null)
+        set(value) = prefs.edit { if (value == null) remove(KEY_EXPORT_FOLDER) else putString(KEY_EXPORT_FOLDER, value) }
+
+    /** Recordings that started before this are not exported (0 = export everything). */
+    var exportFromMillis: Long
+        get() = prefs.getLong(KEY_EXPORT_FROM, 0L)
+        set(value) = prefs.edit { putLong(KEY_EXPORT_FROM, value) }
+
+    /** File names already copied to the export folder. Deliberately not in Room: see specs/004 plan. */
+    val exportedFiles: Set<String>
+        get() = prefs.getStringSet(KEY_EXPORTED, null)?.toSet() ?: emptySet()
+
+    @Synchronized
+    fun addExported(fileName: String) = prefs.edit { putStringSet(KEY_EXPORTED, exportedFiles + fileName) }
+
+    @Synchronized
+    fun removeExported(fileName: String) = prefs.edit { putStringSet(KEY_EXPORTED, exportedFiles - fileName) }
+
     private companion object {
+        const val KEY_EXPORT_FOLDER = "export_folder_uri"
+        const val KEY_EXPORT_FROM = "export_from_millis"
+        const val KEY_EXPORTED = "exported_files"
+
         const val KEY_AUTO_UPDATE = "auto_update_check"
         const val KEY_PRE_RELEASES = "include_pre_releases"
         const val KEY_LAST_UPDATE_CHECK = "last_update_check"

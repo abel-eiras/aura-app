@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import io.github.abeleiras.aura.data.RecordingRepository
 import io.github.abeleiras.aura.data.db.AuraDatabase
+import io.github.abeleiras.aura.data.export.ExportRepository
 import io.github.abeleiras.aura.data.update.UpdateController
 import io.github.abeleiras.aura.data.prefs.AppSettings
 import io.github.abeleiras.aura.recording.PlaybackController
@@ -32,6 +33,8 @@ class AppContainer(private val context: Context) {
     private val database by lazy {
         Room.databaseBuilder(context, AuraDatabase::class.java, "aura.db").build()
     }
+
+    val exports by lazy { ExportRepository(appContext, settings, recordings) }
 
     private val http by lazy {
         OkHttpClient.Builder()

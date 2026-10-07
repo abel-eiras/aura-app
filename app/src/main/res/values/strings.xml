@@ -82,4 +82,27 @@
     <string name="settings_update_auto">Check for updates automatically (once a day)</string>
     <string name="settings_update_pre_releases">Receive test versions</string>
     <string name="settings_update_check_now">Check for updates</string>
+    <string name="settings_export_section">Export</string>
+    <string name="settings_export_description">Aura copies each new recording to a folder you choose, so apps like Syncthing or Obsidian can pick it up. Deleting a recording in Aura never deletes the exported copy.</string>
+    <string name="settings_export_folder_none">No folder chosen</string>
+    <string name="settings_export_folder_current">Exporting to: %1$s</string>
+    <string name="settings_export_folder_unnamed">(folder)</string>
+    <string name="settings_export_permission_lost">Aura can no longer write to that folder. Choose it again.</string>
+    <string name="settings_export_running">Exporting…</string>
+    <string name="settings_export_choose">Choose folder</string>
+    <string name="settings_export_change">Change folder</string>
+    <string name="settings_export_stop">Stop exporting</string>
+    <string name="settings_export_retry">Try again now</string>
+    <string name="settings_export_all">Export all recordings</string>
+    <string name="export_existing_title">Export existing recordings?</string>
+    <string name="export_existing_body">You already have %1$d recordings. Copy them to the folder too, or only export new ones from now on?</string>
+    <string name="export_existing_yes">Export all</string>
+    <string name="export_existing_no">Only new ones</string>
+    <string name="recordings_export_exported">Exported</string>
+    <string name="recordings_export_pending">Waiting to export</string>
+    <string name="recordings_export_failed">Export failed</string>
+    <string name="recordings_export_retry">Retry</string>
+    <string name="recordings_delete_confirm_body_exported">The recording will be removed from this phone and can\'t be recovered. The copy already exported to your folder is not deleted.</string>
+    <string name="content_description_share_recording">Share recording</string>
+    <string name="share_chooser_title">Share recording</string>
 </resources>
