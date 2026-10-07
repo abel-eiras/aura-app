@@ -6,7 +6,6 @@ import io.github.abeleiras.aura.domain.processing.StoredNote
 import io.github.abeleiras.aura.domain.processing.storedNoteFromJson
 import io.github.abeleiras.aura.domain.processing.toJson
 import io.github.abeleiras.aura.domain.transcript.Transcript
-import kotlinx.serialization.SerializationException
 import java.io.File
 
 /**
@@ -48,10 +47,8 @@ class FileProcessingStore(private val dir: File) : ProcessingStore {
         if (!file.isFile) return null
         return try {
             parse(file.readText())
-        } catch (_: SerializationException) {
-            null // unreadable: treated as missing, so the step is redone rather than the app failing
         } catch (_: IllegalArgumentException) {
-            null
+            null // unreadable (SerializationException is one): treated as missing, so the step is redone rather than the app failing
         }
     }
 
