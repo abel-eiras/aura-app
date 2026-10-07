@@ -12,8 +12,11 @@ wait_seconds="${SMOKE_WAIT_SECONDS:-20}"
 
 fail() {
   echo "::error::SMOKE TEST FAILED: $1"
-  echo "---- relevant logcat ----"
-  adb logcat -d -b main,system,crash 2>/dev/null | grep -iE "abeleiras|FATAL|AndroidRuntime|SecurityException" | tail -120 || true
+  echo "---- fatal exceptions ----"
+  adb logcat -d -b crash,main 2>/dev/null | grep -A30 "FATAL EXCEPTION" | head -80 || true
+  echo "---- other relevant logcat (emulator noise filtered out) ----"
+  adb logcat -d -b main,system,crash 2>/dev/null | grep -iE "abeleiras|AndroidRuntime|SecurityException" \
+    | grep -vE "ApkAssets|AppHibernationService|ShortcutService|AiAi|ImeTracker" | tail -60 || true
   exit 1
 }
 

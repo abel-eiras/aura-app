@@ -31,7 +31,7 @@ comprobación de versión del arranque lanzaba una `SecurityException` en un hil
 
 - [x] T006-19 Declarar `INTERNET` y test que lee el manifiesto (`ManifestPermissionsTest`)
 - [x] T006-20 Interceptor que convierte excepciones inesperadas en `IOException` (`RuntimeExceptionsAsIoException`, FR-007-05)
-- [ ] T006-18 **Prueba de humo en CI con emulador**: arrancar el APK release, esperar unos segundos y comprobar que el proceso sigue vivo (`reactivecircus/android-emulator-runner`; los runners de GitHub admiten KVM). Es lo que habría detectado el fallo antes de publicar
+- [x] T006-18 **Prueba de humo en CI con emulador** (`scripts/smoke-test.sh`, job `smoke`): instala el APK release (R8) en un emulador API 35, lo abre, espera 20 s y falla si el proceso desaparece, aparece la pantalla de error o hay una excepción fatal. **Comprobado que sabe fallar** con un cierre provocado en `MainActivity.onCreate` (CI en rojo solo en `smoke`, con la excepción en el log)
 
 ## Fase 3 — Hito 3
 
