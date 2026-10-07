@@ -223,4 +223,6 @@
     <string name="banner_setup">Finish setup</string>
     <string name="banner_process_all">Process them now</string>
     <string name="reminder_processing_incomplete">Processing setup isn\'t finished: nothing is sent yet.</string>
+    <string name="processing_details">Details</string>
+    <string name="processing_details_copy">Copy</string>
 </resources>

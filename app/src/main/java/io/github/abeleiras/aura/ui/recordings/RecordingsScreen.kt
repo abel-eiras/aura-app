@@ -58,6 +58,7 @@ fun RecordingsScreen(viewModel: RecordingsViewModel, onOpenNote: (String) -> Uni
     val playback by viewModel.playback.collectAsStateWithLifecycle()
     val readiness by viewModel.readiness.collectAsStateWithLifecycle()
     var pendingDelete by remember { mutableStateOf<RecordingItem?>(null) }
+    var detailsFor by remember { mutableStateOf<RecordingItem?>(null) }
 
     Scaffold(
         topBar = {
@@ -92,11 +93,14 @@ fun RecordingsScreen(viewModel: RecordingsViewModel, onOpenNote: (String) -> Uni
                 onSetupProcessing = onSetupProcessing,
                 onProcess = viewModel::process,
                 onOpenNote = onOpenNote,
+                onShowDetails = { detailsFor = it },
                 onDelete = { pendingDelete = it },
                 modifier = Modifier.padding(padding),
             )
         }
     }
+
+    detailsFor?.let { item -> ErrorDetailsDialog(item, onDismiss = { detailsFor = null }) }
 
     pendingDelete?.let { item ->
         AlertDialog(
@@ -136,6 +140,7 @@ private fun RecordingsList(
     onSetupProcessing: () -> Unit,
     onProcess: (Recording) -> Unit,
     onOpenNote: (String) -> Unit,
+    onShowDetails: (RecordingItem) -> Unit,
     onDelete: (RecordingItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -177,6 +182,7 @@ private fun RecordingsList(
                 onRetryExport = onRetryExport,
                 onProcess = { if (item.canProcess) onProcess(item.recording) else onSetupProcessing() },
                 onOpenNote = { onOpenNote(item.recording.fileName) },
+                onShowDetails = { onShowDetails(item) },
                 onDelete = { onDelete(item) },
             )
             HorizontalDivider()
@@ -193,6 +199,7 @@ private fun RecordingRow(
     onRetryExport: () -> Unit,
     onProcess: () -> Unit,
     onOpenNote: () -> Unit,
+    onShowDetails: () -> Unit,
     onDelete: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -230,6 +237,7 @@ private fun RecordingRow(
                 }
             }
             val status = item.job?.status
+            if (status == JobStatus.ERROR) TextButton(onClick = onShowDetails) { Text(stringResource(R.string.processing_details)) }
             when {
                 status == JobStatus.READY -> TextButton(onClick = onOpenNote) { Text(stringResource(R.string.processing_action_open)) }
                 status == null || status == JobStatus.ERROR ->
@@ -319,4 +327,32 @@ private fun exportLabel(status: ExportStatus): String? = when (status) {
     ExportStatus.PENDING -> stringResource(R.string.recordings_export_pending)
     ExportStatus.ERROR -> stringResource(R.string.recordings_export_failed)
     ExportStatus.EXPORTED -> stringResource(R.string.recordings_export_exported)
+}
+
+/** The technical detail of a failed processing, copyable, so a report can say exactly what happened. */
+@Composable
+private fun ErrorDetailsDialog(item: RecordingItem, onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val job = item.job
+    val text = buildString {
+        appendLine("file: ${item.recording.fileName}")
+        appendLine("size: ${item.recording.sizeBytes} bytes, duration: ${item.recording.durationMillis / 1000} s")
+        appendLine("status: ${job?.status}")
+        appendLine("reason: ${job?.error}")
+        appendLine("attempts: ${job?.attempts}")
+        appendLine("at: ${job?.updatedAt}")
+        append("detail: ${job?.message ?: "-"}")
+    }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.processing_details)) },
+        text = { androidx.compose.foundation.text.selection.SelectionContainer { Text(text, style = MaterialTheme.typography.bodySmall) } },
+        confirmButton = {
+            TextButton(onClick = {
+                context.getSystemService(android.content.ClipboardManager::class.java)
+                    ?.setPrimaryClip(android.content.ClipData.newPlainText("Aura", text))
+            }) { Text(stringResource(R.string.processing_details_copy)) }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.crash_close)) } },
+    )
 }
