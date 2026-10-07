@@ -7,7 +7,9 @@ import io.github.abeleiras.aura.domain.ai.CredentialState
 import io.github.abeleiras.aura.domain.ai.GeminiClient
 import io.github.abeleiras.aura.domain.ai.ProcessingMode
 import io.github.abeleiras.aura.domain.ai.ProviderDefaults
+import io.github.abeleiras.aura.domain.ai.ProviderReadiness
 import io.github.abeleiras.aura.domain.ai.canSendToProvider
+import io.github.abeleiras.aura.domain.ai.providerReadiness
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,6 +31,7 @@ data class ProviderState(
 ) {
     val hasKey: Boolean get() = keyHint != null
     val canSend: Boolean get() = canSendToProvider(mode, hasKey, privacyAccepted)
+    val readiness: ProviderReadiness get() = providerReadiness(mode, hasKey, credential, privacyAccepted)
 }
 
 /** Owns the provider setup (spec 002). Lives in [io.github.abeleiras.aura.AppContainer] so it survives navigation. */

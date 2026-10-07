@@ -48,6 +48,7 @@ fun MainScreen(
     onSettingsClick: () -> Unit,
     onRecordingsClick: () -> Unit,
     showProcessingReminder: Boolean,
+    reminderIncomplete: Boolean,
     onSetupProcessing: () -> Unit,
     onDismissReminder: () -> Unit,
 ) {
@@ -81,12 +82,12 @@ fun MainScreen(
                 Card(modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 16.dp, top = 4.dp, bottom = 4.dp, end = 4.dp)) {
                         Text(
-                            text = stringResource(R.string.reminder_processing),
+                            text = stringResource(if (reminderIncomplete) R.string.reminder_processing_incomplete else R.string.reminder_processing),
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.weight(1f),
                         )
                         TextButton(onClick = onSetupProcessing) { Text(stringResource(R.string.reminder_processing_action)) }
-                        TextButton(onClick = onDismissReminder) { Text(stringResource(R.string.reminder_processing_dismiss)) }
+                        if (!reminderIncomplete) TextButton(onClick = onDismissReminder) { Text(stringResource(R.string.reminder_processing_dismiss)) }
                     }
                 }
             }

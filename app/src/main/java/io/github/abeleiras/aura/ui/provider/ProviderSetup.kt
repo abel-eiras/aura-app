@@ -164,7 +164,7 @@ private fun GeminiStep(controller: ProviderController, state: ProviderState) {
         }
         if (state.saveFailed) Text(stringResource(R.string.gemini_save_failed), color = MaterialTheme.colorScheme.error)
         CredentialStatus(state)
-        if (state.hasKey && state.credential == CredentialState.VALID) PrivacyNotice(controller, state)
+        if (state.hasKey && state.credential != CredentialState.INVALID) PrivacyNotice(controller, state)
     }
 }
 

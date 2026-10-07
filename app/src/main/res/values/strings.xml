@@ -214,4 +214,13 @@
     <string name="provider_model_draft">Note writing model</string>
     <string name="provider_models_save">Save models</string>
     <string name="provider_models_defaults">Restore defaults</string>
+    <string name="banner_no_provider">Processing is off: Aura only records. Choose a provider to get transcripts and notes.</string>
+    <string name="banner_no_key">There is no key yet, so nothing is processed.</string>
+    <string name="banner_key_invalid">The saved key isn\'t valid, so nothing is processed.</string>
+    <string name="banner_needs_privacy">One step left: accept the privacy notice. Until then nothing is sent for processing.</string>
+    <string name="banner_ready">Processing with Gemini is on. New recordings are processed when you stop them.</string>
+    <string name="banner_ready_pending">Processing with Gemini is on. %1$d recording(s) are not processed yet.</string>
+    <string name="banner_setup">Finish setup</string>
+    <string name="banner_process_all">Process them now</string>
+    <string name="reminder_processing_incomplete">Processing setup isn\'t finished: nothing is sent yet.</string>
 </resources>

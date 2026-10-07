@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.abeleiras.aura.R
 import io.github.abeleiras.aura.data.Recording
+import io.github.abeleiras.aura.domain.ai.ProviderReadiness
 import io.github.abeleiras.aura.domain.export.ExportStatus
 import io.github.abeleiras.aura.domain.processing.ErrorReason
 import io.github.abeleiras.aura.domain.processing.JobRecord
@@ -52,9 +53,10 @@ import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecordingsScreen(viewModel: RecordingsViewModel, onOpenNote: (String) -> Unit, onBackClick: () -> Unit) {
+fun RecordingsScreen(viewModel: RecordingsViewModel, onOpenNote: (String) -> Unit, onSetupProcessing: () -> Unit, onBackClick: () -> Unit) {
     val items by viewModel.items.collectAsStateWithLifecycle()
     val playback by viewModel.playback.collectAsStateWithLifecycle()
+    val readiness by viewModel.readiness.collectAsStateWithLifecycle()
     var pendingDelete by remember { mutableStateOf<RecordingItem?>(null) }
 
     Scaffold(
@@ -85,6 +87,9 @@ fun RecordingsScreen(viewModel: RecordingsViewModel, onOpenNote: (String) -> Uni
                 onPlayToggle = viewModel::togglePlayback,
                 onSeek = viewModel::seekTo,
                 onRetryExport = viewModel::retryExport,
+                readiness = readiness,
+                onProcessAll = viewModel::processAllPending,
+                onSetupProcessing = onSetupProcessing,
                 onProcess = viewModel::process,
                 onOpenNote = onOpenNote,
                 onDelete = { pendingDelete = it },
@@ -126,6 +131,9 @@ private fun RecordingsList(
     onPlayToggle: (Recording) -> Unit,
     onSeek: (Int) -> Unit,
     onRetryExport: () -> Unit,
+    readiness: ProviderReadiness,
+    onProcessAll: () -> Unit,
+    onSetupProcessing: () -> Unit,
     onProcess: (Recording) -> Unit,
     onOpenNote: (String) -> Unit,
     onDelete: (RecordingItem) -> Unit,
@@ -134,6 +142,14 @@ private fun RecordingsList(
     val context = LocalContext.current
     val totalBytes = items.sumOf { it.recording.sizeBytes }
     LazyColumn(modifier = modifier.fillMaxSize()) {
+        item {
+            ProcessingBanner(
+                readiness = readiness,
+                pending = items.count { it.job == null || it.job.status == JobStatus.ERROR },
+                onProcessAll = onProcessAll,
+                onSetup = onSetupProcessing,
+            )
+        }
         item {
             Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                 Text(
@@ -159,7 +175,7 @@ private fun RecordingsList(
                 onPlayToggle = { onPlayToggle(item.recording) },
                 onSeek = onSeek,
                 onRetryExport = onRetryExport,
-                onProcess = { onProcess(item.recording) },
+                onProcess = { if (item.canProcess) onProcess(item.recording) else onSetupProcessing() },
                 onOpenNote = { onOpenNote(item.recording.fileName) },
                 onDelete = { onDelete(item) },
             )
@@ -216,7 +232,7 @@ private fun RecordingRow(
             val status = item.job?.status
             when {
                 status == JobStatus.READY -> TextButton(onClick = onOpenNote) { Text(stringResource(R.string.processing_action_open)) }
-                item.canProcess && (status == null || status == JobStatus.ERROR) ->
+                status == null || status == JobStatus.ERROR ->
                     TextButton(onClick = onProcess) {
                         Text(stringResource(if (status == JobStatus.ERROR) R.string.processing_action_retry else R.string.processing_action_process))
                     }
@@ -241,6 +257,31 @@ private fun RecordingRow(
                     modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
                 )
                 Text(RecordingPolicy.formatDuration(playback.durationMillis.toLong()), style = MaterialTheme.typography.labelSmall)
+            }
+        }
+    }
+}
+
+/** Says where processing stands, and what to do about it, above the list (nothing silent). */
+@Composable
+private fun ProcessingBanner(readiness: ProviderReadiness, pending: Int, onProcessAll: () -> Unit, onSetup: () -> Unit) {
+    val text = when (readiness) {
+        ProviderReadiness.NO_PROVIDER -> R.string.banner_no_provider
+        ProviderReadiness.NO_KEY -> R.string.banner_no_key
+        ProviderReadiness.KEY_INVALID -> R.string.banner_key_invalid
+        ProviderReadiness.NEEDS_PRIVACY -> R.string.banner_needs_privacy
+        ProviderReadiness.READY -> if (pending > 0) R.string.banner_ready_pending else R.string.banner_ready
+    }
+    Card(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text(
+                if (readiness == ProviderReadiness.READY && pending > 0) stringResource(text, pending) else stringResource(text),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            if (readiness != ProviderReadiness.READY) {
+                TextButton(onClick = onSetup) { Text(stringResource(R.string.banner_setup)) }
+            } else if (pending > 0) {
+                TextButton(onClick = onProcessAll) { Text(stringResource(R.string.banner_process_all)) }
             }
         }
     }

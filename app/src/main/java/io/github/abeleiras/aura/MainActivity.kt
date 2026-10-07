@@ -35,6 +35,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.github.abeleiras.aura.domain.ai.ProcessingMode
+import io.github.abeleiras.aura.domain.ai.ProviderReadiness
 import io.github.abeleiras.aura.ui.main.MainScreen
 import io.github.abeleiras.aura.ui.main.MainViewModel
 import io.github.abeleiras.aura.ui.notes.NoteScreen
@@ -205,7 +206,9 @@ private fun AuraApp(versionName: String, openNote: String?, onOpenNoteHandled: (
             MainScreen(
                 viewModel = mainViewModel,
                 updates = container.updates,
-                showProcessingReminder = providerState.mode == ProcessingMode.NONE && !reminderDismissed,
+                showProcessingReminder = (providerState.mode == ProcessingMode.NONE && !reminderDismissed) ||
+                    (providerState.mode != ProcessingMode.NONE && providerState.readiness != ProviderReadiness.READY),
+                reminderIncomplete = providerState.mode != ProcessingMode.NONE,
                 onSetupProcessing = { navController.navigate(Routes.PROVIDER) },
                 onDismissReminder = {
                     reminderDismissed = true
@@ -220,6 +223,7 @@ private fun AuraApp(versionName: String, openNote: String?, onOpenNoteHandled: (
             RecordingsScreen(
                 viewModel = recordingsViewModel,
                 onOpenNote = { navController.navigate(Routes.note(it)) },
+                onSetupProcessing = { navController.navigate(Routes.PROVIDER) },
                 onBackClick = { navController.popBackStack() },
             )
         }

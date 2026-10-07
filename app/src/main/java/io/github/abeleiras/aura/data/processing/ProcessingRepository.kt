@@ -98,6 +98,15 @@ class ProcessingRepository(
         schedule(fileName, typeId = null, ExistingWorkPolicy.KEEP)
     }
 
+    /** Queues every recording that has no result yet or failed; returns how many. */
+    suspend fun enqueuePending(): Int {
+        if (!canProcess) return 0
+        val jobs = store.loadAllJobs()
+        val pending = recordings.all().filter { jobs[idOf(it.fileName)].let { job -> job == null || job.status == JobStatus.ERROR } }
+        pending.forEach { enqueue(it.fileName) }
+        return pending.size
+    }
+
     /**
      * HU-003-4. [typeId] drafts with that note type instead of classifying; [transcribeAgain] also discards the
      * transcript (the caller has shown the cost warning). Whatever stays is reused, so the cheap options really

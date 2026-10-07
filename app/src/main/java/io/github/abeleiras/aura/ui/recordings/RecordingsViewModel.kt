@@ -6,11 +6,13 @@ import io.github.abeleiras.aura.AppContainer
 import io.github.abeleiras.aura.data.Recording
 import io.github.abeleiras.aura.data.processing.ProcessingRepository
 import io.github.abeleiras.aura.domain.processing.JobRecord
+import io.github.abeleiras.aura.domain.ai.ProviderReadiness
 import io.github.abeleiras.aura.domain.export.ExportStatus
 import io.github.abeleiras.aura.recording.PlaybackState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -48,6 +50,14 @@ class RecordingsViewModel(private val container: AppContainer) : ViewModel() {
         container.exports.forget(recording.fileName)
         container.processing.forget(recording.fileName)
         viewModelScope.launch { container.recordings.delete(recording.fileName) }
+    }
+
+    val readiness: StateFlow<ProviderReadiness> = container.provider.state
+        .map { it.readiness }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ProviderReadiness.NO_PROVIDER)
+
+    fun processAllPending() {
+        container.appScope.launch { container.processing.enqueuePending() }
     }
 
     fun process(recording: Recording) = container.processing.enqueue(recording.fileName)

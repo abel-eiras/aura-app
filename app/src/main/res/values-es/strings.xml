@@ -214,4 +214,13 @@
     <string name="provider_model_draft">Modelo de redacción</string>
     <string name="provider_models_save">Guardar modelos</string>
     <string name="provider_models_defaults">Restaurar los de fábrica</string>
+    <string name="banner_no_provider">El procesado está desactivado: Aura solo graba. Elige un proveedor para tener transcripciones y notas.</string>
+    <string name="banner_no_key">Aún no hay clave, así que no se procesa nada.</string>
+    <string name="banner_key_invalid">La clave guardada no es válida, así que no se procesa nada.</string>
+    <string name="banner_needs_privacy">Falta un paso: aceptar el aviso de privacidad. Hasta entonces no se envía nada para procesar.</string>
+    <string name="banner_ready">El procesado con Gemini está activo. Las grabaciones nuevas se procesan al pararlas.</string>
+    <string name="banner_ready_pending">El procesado con Gemini está activo. Hay %1$d grabación(es) sin procesar.</string>
+    <string name="banner_setup">Terminar la configuración</string>
+    <string name="banner_process_all">Procesarlas ahora</string>
+    <string name="reminder_processing_incomplete">La configuración del procesado no está terminada: aún no se envía nada.</string>
 </resources>
