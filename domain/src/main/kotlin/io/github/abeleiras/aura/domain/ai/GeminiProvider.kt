@@ -295,6 +295,8 @@ class GeminiProvider(
             return when {
                 "location is not supported" in lower ->
                     ProviderException(ErrorReason.PROVIDER_UNAVAILABLE, false, "Gemini is not available in this country ($detail)")
+                code == 404 || "no longer available" in lower || "is not found" in lower || "is not supported for" in lower ->
+                    ProviderException(ErrorReason.MODEL_UNAVAILABLE, false, detail)
                 code == 429 && ("per day" in lower || "daily" in lower || "perday" in lower) ->
                     ProviderException(ErrorReason.QUOTA_EXHAUSTED, false, detail)
                 code == 429 -> ProviderException(ErrorReason.RATE_LIMITED, true, detail)

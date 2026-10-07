@@ -5,6 +5,8 @@ import io.github.abeleiras.aura.domain.ai.ApiKeys
 import io.github.abeleiras.aura.domain.ai.CredentialCheck
 import io.github.abeleiras.aura.domain.ai.CredentialState
 import io.github.abeleiras.aura.domain.ai.GeminiClient
+import io.github.abeleiras.aura.domain.ai.GeminiModel
+import io.github.abeleiras.aura.domain.ai.ModelPicker
 import io.github.abeleiras.aura.domain.ai.ProcessingMode
 import io.github.abeleiras.aura.domain.ai.ProviderDefaults
 import io.github.abeleiras.aura.domain.ai.ProviderReadiness
@@ -28,6 +30,8 @@ data class ProviderState(
     val checking: Boolean = false,
     val lastCheck: CredentialCheck? = null,
     val saveFailed: Boolean = false,
+    /** Flash models the key can use, from the last successful check (for Advanced settings). */
+    val models: List<String> = emptyList(),
 ) {
     val hasKey: Boolean get() = keyHint != null
     val canSend: Boolean get() = canSendToProvider(mode, hasKey, privacyAccepted)
@@ -84,7 +88,11 @@ class ProviderController(
             val result = GeminiClient(http, key).checkCredential()
             val now = System.currentTimeMillis()
             when (result) {
-                is CredentialCheck.Valid -> store(CredentialState.VALID, now)
+                is CredentialCheck.Valid -> {
+                    store(CredentialState.VALID, now)
+                    autoSelect(result.models)
+                    _state.update { it.copy(models = ModelPicker.flashModels(result.models)) }
+                }
                 CredentialCheck.InvalidKey -> store(CredentialState.INVALID, now)
                 else -> Unit // couldn't tell: keep whatever we knew
             }
@@ -127,7 +135,34 @@ class ProviderController(
     val transcribeModel: String get() = settings.transcribeModel
     val draftModel: String get() = settings.draftModel
 
+    private fun autoSelect(models: List<GeminiModel>) {
+        if (settings.modelsCustomized) return
+        ModelPicker.bestFlash(models)?.let {
+            settings.transcribeModel = it
+            settings.draftModel = it
+        }
+    }
+
+    /**
+     * A job failed because its model is gone: look for one the key has and report whether the choice changed, so the
+     * caller can try again. Never touches models the user typed.
+     */
+    suspend fun refreshModelsAfterUnavailable(): Boolean {
+        if (settings.modelsCustomized) return false
+        val key = credentials.get(CredentialStore.GEMINI_KEY) ?: return false
+        val check = GeminiClient(http, key).checkCredential() as? CredentialCheck.Valid ?: return false
+        val before = settings.transcribeModel to settings.draftModel
+        autoSelect(check.models)
+        return before != (settings.transcribeModel to settings.draftModel)
+    }
+
     fun saveModels(transcribe: String, draft: String) {
+        if (transcribe.isBlank() && draft.isBlank()) {
+            settings.resetModels()
+            check() // picks a model the key really has
+            return
+        }
+        settings.modelsCustomized = true
         settings.transcribeModel = transcribe.trim().ifEmpty { ProviderDefaults.GEMINI_TRANSCRIBE_MODEL }
         settings.draftModel = draft.trim().ifEmpty { ProviderDefaults.GEMINI_DRAFT_MODEL }
     }

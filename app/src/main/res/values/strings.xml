@@ -227,4 +227,6 @@
     <string name="processing_details_copy">Copy</string>
     <string name="processing_retrying_busy">The provider is busy; trying again soon…</string>
     <string name="processing_retrying_network">No answer in time; trying again…</string>
+    <string name="processing_error_model">The model is no longer available. Pick another one in Settings → Processing → Advanced.</string>
+    <string name="provider_models_available">Available to your key: %1$s</string>
 </resources>

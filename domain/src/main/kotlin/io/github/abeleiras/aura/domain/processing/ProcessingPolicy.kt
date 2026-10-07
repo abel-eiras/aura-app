@@ -18,6 +18,8 @@ enum class ErrorReason {
     INSUFFICIENT_FUNDS,
     AUDIO_TOO_LONG,
     INVALID_RESPONSE,
+    /** The configured model was retired or never existed for this key. */
+    MODEL_UNAVAILABLE,
     UNKNOWN,
 }
 
