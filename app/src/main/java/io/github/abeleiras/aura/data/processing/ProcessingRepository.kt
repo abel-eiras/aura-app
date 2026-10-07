@@ -95,12 +95,30 @@ class ProcessingRepository(
         if (existing == null || existing.status == JobStatus.ERROR) {
             store.saveJob(id, JobRecord(JobStatus.QUEUED, updatedAt = Instant.now().toString()))
         }
+        schedule(fileName, typeId = null, ExistingWorkPolicy.KEEP)
+    }
+
+    /**
+     * HU-003-4. [typeId] drafts with that note type instead of classifying; [transcribeAgain] also discards the
+     * transcript (the caller has shown the cost warning). Whatever stays is reused, so the cheap options really
+     * are cheap (FR-003-11).
+     */
+    fun regenerate(fileName: String, typeId: String? = null, transcribeAgain: Boolean = false) {
+        if (!canProcess) return
+        val id = idOf(fileName)
+        if (transcribeAgain) store.deleteTranscript(id)
+        store.deleteNote(id)
+        store.saveJob(id, JobRecord(JobStatus.QUEUED, updatedAt = Instant.now().toString()))
+        schedule(fileName, typeId, ExistingWorkPolicy.REPLACE)
+    }
+
+    private fun schedule(fileName: String, typeId: String?, policy: ExistingWorkPolicy) {
         val request = OneTimeWorkRequestBuilder<ProcessingWorker>()
-            .setInputData(workDataOf(ProcessingWorker.KEY_FILE to fileName))
+            .setInputData(workDataOf(ProcessingWorker.KEY_FILE to fileName, ProcessingWorker.KEY_TYPE to typeId))
             .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 15, TimeUnit.SECONDS)
             .build()
-        WorkManager.getInstance(context).enqueueUniqueWork("process-$id", ExistingWorkPolicy.KEEP, request)
+        WorkManager.getInstance(context).enqueueUniqueWork("process-${idOf(fileName)}", policy, request)
     }
 
     /** Recording deleted by the user: stop its work and forget everything derived from it. */
@@ -111,7 +129,7 @@ class ProcessingRepository(
     }
 
     /** Runs the pipeline for one recording; returns what the worker should answer. */
-    internal suspend fun process(fileName: String): ProcessingOutcome? = runLock.withLock {
+    internal suspend fun process(fileName: String, forcedTypeId: String? = null): ProcessingOutcome? = runLock.withLock {
         val id = idOf(fileName)
         val recording = recordings.all().firstOrNull { it.fileName == fileName } ?: return@withLock null // deleted meanwhile
         val key = provider.keyForSending() ?: return@withLock null // mode changed or consent revoked: send nothing
@@ -130,7 +148,10 @@ class ProcessingRepository(
             draftModel = settings.draftModel,
         )
         val outcome = try {
-            pipeline.run(ProcessingInput(id, recording.file, recording.durationMillis / 1000.0))
+            pipeline.run(
+                ProcessingInput(id, recording.file, recording.durationMillis / 1000.0),
+                forcedType = forcedTypeId?.let { typeById(it) },
+            )
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -198,6 +219,9 @@ class ProcessingRepository(
         files
     }
 
+    /** The built-in types in the UI language (the user's own types arrive with spec 005's editor). */
+    fun availableTypes(): List<NoteType> = NoteTypeCatalogs.defaults(Locale.getDefault().language).types
+
     /** Looks the type up in every language's built-ins: a note keeps its type id whatever language the UI uses now. */
     fun typeById(id: String): NoteType? =
         (listOf(Locale.getDefault().language) + listOf("es", "en", "gl")).firstNotNullOfOrNull { lang ->
@@ -218,7 +242,7 @@ class ProcessingRepository(
 class ProcessingWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
         val fileName = inputData.getString(KEY_FILE) ?: return Result.failure()
-        return when (val outcome = applicationContext.container.processing.process(fileName)) {
+        return when (val outcome = applicationContext.container.processing.process(fileName, inputData.getString(KEY_TYPE))) {
             is ProcessingOutcome.RetryLater -> Result.retry()
             is ProcessingOutcome.Finished, null -> Result.success()
         }
@@ -226,5 +250,6 @@ class ProcessingWorker(context: Context, params: WorkerParameters) : CoroutineWo
 
     companion object {
         const val KEY_FILE = "file"
+        const val KEY_TYPE = "type"
     }
 }

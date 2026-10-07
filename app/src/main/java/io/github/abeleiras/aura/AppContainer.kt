@@ -45,7 +45,7 @@ class AppContainer(private val context: Context) {
         Room.databaseBuilder(context, AuraDatabase::class.java, "aura.db").build()
     }
 
-    val exports by lazy { ExportRepository(appContext, settings, recordings, derivedFiles = { processing.exportFilesFor(it) }) }
+    val exports: ExportRepository by lazy { ExportRepository(appContext, settings, recordings, derivedFiles = { processing.exportFilesFor(it) }) }
 
     private val http by lazy {
         OkHttpClient.Builder()
@@ -60,7 +60,7 @@ class AppContainer(private val context: Context) {
 
     val provider by lazy { ProviderController(settings, credentials, http, appScope) }
 
-    val processing by lazy {
+    val processing: ProcessingRepository by lazy {
         ProcessingRepository(
             context = appContext,
             store = FileProcessingStore(File(context.filesDir, "processing")),

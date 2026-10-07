@@ -30,6 +30,16 @@ class FileProcessingStore(private val dir: File) : ProcessingStore {
 
     override fun saveJob(id: String, job: JobRecord) = write(id, JOB, job.toJson())
 
+    fun deleteNote(id: String) {
+        File(dir, "$id.$NOTE.json").delete()
+        onChange()
+    }
+
+    fun deleteTranscript(id: String) {
+        File(dir, "$id.$TRANSCRIPT.json").delete()
+        onChange()
+    }
+
     fun loadAllJobs(): Map<String, JobRecord> =
         dir.listFiles { f -> f.name.endsWith(".$JOB.json") }.orEmpty().mapNotNull { f ->
             val id = f.name.removeSuffix(".$JOB.json")

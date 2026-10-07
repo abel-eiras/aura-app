@@ -247,7 +247,7 @@ private fun RecordingRow(
 }
 
 @Composable
-private fun processingLabel(job: JobRecord?): String? {
+internal fun processingLabel(job: JobRecord?): String? {
     job ?: return null
     return when (job.status) {
         JobStatus.QUEUED -> stringResource(if (job.attempts > 0) R.string.processing_retrying else R.string.processing_queued)

@@ -74,7 +74,10 @@ class ProcessingPipeline(
     private val draftModel: String?,
     private val now: () -> Instant = { Instant.now() },
 ) {
-    suspend fun run(input: ProcessingInput): ProcessingOutcome {
+    /**
+     * @param forcedType draft with this type and skip classification ("Change type", HU-003-4); null classifies as usual.
+     */
+    suspend fun run(input: ProcessingInput, forcedType: NoteType? = null): ProcessingOutcome {
         var job = store.loadJob(input.id) ?: JobRecord(JobStatus.QUEUED, updatedAt = now().toString())
         fun update(status: JobStatus, attempts: Int = job.attempts, error: ErrorReason? = null, message: String? = null) {
             job = JobRecord(status, attempts, error, message, now().toString())
@@ -105,7 +108,12 @@ class ProcessingPipeline(
                     ProcessingStep.DRAFT -> {
                         update(JobStatus.DRAFTING)
                         val transcript = checkNotNull(store.loadTranscript(input.id))
-                        val drafted = NoteDrafter(provider, types, draftModel).run(transcript)
+                        val drafter = NoteDrafter(provider, types, draftModel)
+                        val drafted = if (forcedType != null) {
+                            DraftedNote(forcedType, drafter.draft(transcript, forcedType), classifiedByFallback = false)
+                        } else {
+                            drafter.run(transcript)
+                        }
                         store.saveNote(
                             input.id,
                             StoredNote(drafted.type.id, drafted.body, now().toString(), draftModel, drafted.classifiedByFallback),

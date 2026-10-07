@@ -197,4 +197,13 @@
     <string name="speaker_generic">Hablante</string>
     <string name="settings_auto_process">Procesar las grabaciones automáticamente al guardarlas</string>
     <string name="settings_notify_ready">Avisarme cuando una nota esté lista</string>
+    <string name="note_more">Más opciones</string>
+    <string name="note_change_type">Cambiar el tipo de nota</string>
+    <string name="note_rewrite">Volver a redactar la nota</string>
+    <string name="note_transcribe_again">Volver a transcribir</string>
+    <string name="note_transcribe_again_warning">El audio se enviará de nuevo al proveedor y gastará tu cuota o saldo. Se perderán los nombres de hablante que hayas puesto.</string>
+    <string name="note_transcribe_again_confirm">Transcribir de nuevo</string>
+    <string name="note_merge_title">¿Es la misma persona?</string>
+    <string name="note_merge_hint">Si la app ha separado a una persona en dos hablantes, únelos.</string>
+    <string name="note_merge_into">Unir con %1$s</string>
 </resources>

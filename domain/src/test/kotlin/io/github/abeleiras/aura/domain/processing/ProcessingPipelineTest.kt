@@ -151,4 +151,21 @@ class ProcessingPipelineTest {
         assertEquals(note, storedNoteFromJson(note.toJson()))
         assertTrue(note.toJson().contains("reunion"))
     }
+
+    // FR-003-11 / HU-003-4: "Change type" redrafts with that type, without classifying and without transcribing again
+    @Test
+    fun `a forced type skips classification and reuses the transcript`() = runTest {
+        val store = MemoryStore()
+        store.saveTranscript(input.id, talk)
+        val prompts = mutableListOf<String>()
+        val provider = ScriptedProvider({ error("must not transcribe") }, { prompts += it; "## Contenido\nTexto" })
+        val personal = types.first { it.id == "nota_personal" }
+
+        val outcome = pipeline(provider, store).run(input, forcedType = personal)
+
+        assertEquals(ProcessingOutcome.Finished(JobStatus.READY), outcome)
+        assertEquals(1, provider.completeCalls, "only the drafting call")
+        assertEquals("nota_personal", store.notes[input.id]!!.typeId)
+        assertEquals(0, provider.transcribeCalls)
+    }
 }

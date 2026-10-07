@@ -12,5 +12,5 @@
 - [x] T003-10 Persistencia de trabajos, transcripciones y notas (ficheros atómicos en vez de Room; ver el plan) y `ProcessingPipeline` (FR-003-01)
 - [x] T003-11 `ProcessingWorker`, espera de red, notificación y ajustes (FR-003-06, 10, 12)
 - [x] T003-12 Aviso de privacidad previo al primer envío (FR-003-13): `canSendToProvider` + `ProviderSetup`
-- [ ] T003-13 Regenerar redacción/procesado completo (FR-003-11)
+- [x] T003-13 Regenerar redacción / cambiar tipo / transcribir de nuevo con aviso de coste (FR-003-11): `ProcessingPipeline.run(forcedType)`, `ProcessingRepository.regenerate`
 - [ ] T003-14 Medir CE-003-1…4 con grabaciones reales
