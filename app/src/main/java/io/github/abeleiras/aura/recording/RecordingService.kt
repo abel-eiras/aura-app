@@ -64,7 +64,6 @@ class RecordingService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.i(TAG, "command ${intent?.action} (state=${holder.status.value::class.simpleName})")
         try {
             when (intent?.action) {
                 ACTION_START -> startRecording()
@@ -152,14 +151,12 @@ class RecordingService : Service() {
             return
         }
         stopping = true
-        Log.i(TAG, "stopping: closing the file")
         callMonitor.stop()
         storageWatch?.cancel()
         pausedForCall = false
 
         val durationMillis = status.elapsedMillis(System.currentTimeMillis())
         val file: File? = engine.stop()
-        Log.i(TAG, "engine stopped: file=${file?.name} size=${file?.length()} duration=${durationMillis}ms")
         if (lowStorage) notify(ALERT_NOTIFICATION_ID, buildLowStorageNotification())
 
         when {
@@ -171,7 +168,6 @@ class RecordingService : Service() {
             else -> container.appScope.launch {
                 try {
                     container.recordings.register(file, startedAtMillis, durationMillis, quality)
-                    Log.i(TAG, "registered ${file.name}")
                 } catch (e: Exception) {
                     // The audio is on disk; recoverOrphans() will list it on the next start.
                     Log.e(TAG, "Could not register ${file.name}", e)
@@ -184,7 +180,6 @@ class RecordingService : Service() {
     }
 
     private fun finish() {
-        Log.i(TAG, "finish: back to idle")
         holder.stop()
         AuraWidgetProvider.refresh(this)
         stopForeground(STOP_FOREGROUND_REMOVE)

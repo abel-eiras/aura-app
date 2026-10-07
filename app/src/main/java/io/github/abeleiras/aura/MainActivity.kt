@@ -11,7 +11,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -92,7 +91,6 @@ private fun AuraApp(versionName: String) {
 
     // Permissions are asked when first needed: the first tap on "record" (FR-001-10).
     val onToggleRecording: () -> Unit = {
-        Log.i("AuraApp", "orb tapped; status=${container.recordingStateHolder.status.value::class.simpleName}")
         val needsPermission = !container.recordingStateHolder.status.value.isActive &&
             !context.hasPermission(Manifest.permission.RECORD_AUDIO)
         when {

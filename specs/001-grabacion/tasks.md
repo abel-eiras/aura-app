@@ -30,13 +30,12 @@
 - [x] T001-15 Ajustes: calidad y versión (FR-001-04)
 - [x] T001-16 Cadenas es/gl/en
 
-## Fase 4b — Hallazgos de la prueba en un Pixel 10 Pro (0.2.0)
+## Fase 4b — Hallazgo de la prueba en un Pixel 10 Pro (0.2.0)
 
-Grabar y pausar funcionaban; **parar desde la app no**, aunque sí desde la notificación.
+Parar desde la app "no funcionaba": en realidad sí, tocando el círculo, pero **nada lo indicaba**
+(el círculo alterna y la pantalla solo mostraba Pausar). No era un fallo, sino de descubribilidad.
 
-- [x] T001-20 Botón "Parar y guardar" explícito en la pantalla principal junto a Pausar (HU-001-1, escenario 3). Antes solo el círculo alternaba y no había indicación de que parase
-- [x] T001-21 Trazas (`Log.i`) en todo el camino de parada: toque en el círculo → `MainViewModel` → `RecordingService` → `MediaRecorder.stop()` (con su duración) → registro en Room → `finish`
-- [ ] T001-22 **Autor:** con la 0.2.1, parar con el botón nuevo y con el círculo; si el círculo sigue sin responder, pasar `adb logcat -d | grep -E "AuraApp|MainViewModel|RecordingService|AudioRecorderEngine"` para localizar dónde se pierde
+- [x] T001-20 Botón "Parar y guardar" explícito junto a Pausar (HU-001-1, escenario 3)
 
 ## Fase 5 — Verificación
 

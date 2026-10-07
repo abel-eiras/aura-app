@@ -3,7 +3,6 @@ package io.github.abeleiras.aura.recording
 import android.content.Context
 import android.media.MediaRecorder
 import android.os.Build
-import android.os.SystemClock
 import android.util.Log
 import io.github.abeleiras.aura.domain.recording.AudioQuality
 import io.github.abeleiras.aura.domain.recording.RecordingNaming
@@ -62,10 +61,8 @@ class AudioRecorderEngine(private val context: Context) {
         val mediaRecorder = recorder
         recorder = null
         currentFile = null
-        val startedStopping = SystemClock.elapsedRealtime()
         return try {
             mediaRecorder?.stop()
-            Log.i(TAG, "MediaRecorder.stop() took ${SystemClock.elapsedRealtime() - startedStopping} ms")
             file
         } catch (e: RuntimeException) {
             // stop() throws when called right after start() with nothing captured.
