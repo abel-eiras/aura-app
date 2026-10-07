@@ -301,7 +301,9 @@ internal fun processingLabel(job: JobRecord?): String? {
     return when (job.status) {
         JobStatus.QUEUED -> stringResource(
             when {
+                job.error == ErrorReason.QUOTA_EXHAUSTED -> R.string.processing_waiting_quota
                 job.attempts == 0 -> R.string.processing_queued
+                job.error == ErrorReason.QUOTA_EXHAUSTED -> R.string.processing_waiting_quota
                 job.error == ErrorReason.PROVIDER_UNAVAILABLE || job.error == ErrorReason.RATE_LIMITED -> R.string.processing_retrying_busy
                 else -> R.string.processing_retrying
             },

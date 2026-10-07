@@ -177,7 +177,7 @@
     <string name="processing_error_rate_limited">El proveedor está limitando las peticiones. Inténtalo en unos minutos.</string>
     <string name="processing_error_unavailable">El proveedor no está disponible ahora. Inténtalo más tarde.</string>
     <string name="processing_error_credential">Han rechazado la clave. Revísala en Ajustes → Procesado.</string>
-    <string name="processing_error_quota">La cuota gratuita de hoy está agotada. Inténtalo mañana.</string>
+    <string name="processing_error_quota">La cuota gratuita de este modelo está agotada (las claves gratuitas permiten pocas peticiones al día). Inténtalo más tarde.</string>
     <string name="processing_error_funds">No queda saldo en el proveedor.</string>
     <string name="processing_error_too_long">Demasiado larga para procesar (más de 3 horas). Puedes exportar el audio.</string>
     <string name="processing_error_invalid_response">No se pudo leer la respuesta del proveedor. Inténtalo de nuevo.</string>
@@ -229,4 +229,5 @@
     <string name="processing_retrying_network">Sin respuesta a tiempo; reintentando…</string>
     <string name="processing_error_model">El modelo ya no está disponible. Elige otro en Ajustes → Procesado → Avanzado.</string>
     <string name="provider_models_available">Disponibles para tu clave: %1$s</string>
+    <string name="processing_waiting_quota">Cuota gratuita agotada; Aura lo intentará sola cuando se renueve.</string>
 </resources>

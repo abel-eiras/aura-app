@@ -29,6 +29,8 @@ class ProviderException(
     val transient: Boolean,
     message: String? = null,
     cause: Throwable? = null,
+    /** How long the provider asked us to wait, when it said (quota resets, rate limits). */
+    val retryAfter: Duration? = null,
 ) : Exception(message ?: reason.name, cause)
 
 sealed interface FailureDecision {

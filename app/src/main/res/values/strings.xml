@@ -177,7 +177,7 @@
     <string name="processing_error_rate_limited">The provider is limiting requests. Try again in a few minutes.</string>
     <string name="processing_error_unavailable">The provider isn\'t available right now. Try again later.</string>
     <string name="processing_error_credential">The key was rejected. Check it in Settings → Processing.</string>
-    <string name="processing_error_quota">Today\'s free quota is used up. Try again tomorrow.</string>
+    <string name="processing_error_quota">The free quota for this model is used up (free keys allow few requests per day). Try again later.</string>
     <string name="processing_error_funds">Not enough credit with the provider.</string>
     <string name="processing_error_too_long">Too long to process (over 3 hours). You can export the audio instead.</string>
     <string name="processing_error_invalid_response">The provider\'s answer couldn\'t be read. Try again.</string>
@@ -229,4 +229,5 @@
     <string name="processing_retrying_network">No answer in time; trying again…</string>
     <string name="processing_error_model">The model is no longer available. Pick another one in Settings → Processing → Advanced.</string>
     <string name="provider_models_available">Available to your key: %1$s</string>
+    <string name="processing_waiting_quota">Free quota used up; Aura will try again by itself when it renews.</string>
 </resources>
