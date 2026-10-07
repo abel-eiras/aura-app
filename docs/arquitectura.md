@@ -33,31 +33,36 @@ actualizaciones, desactivable). Ninguna otra.
 
 ## Módulos y capas
 
-Un único módulo Gradle `app` al principio (Constitución VII); se separa en
-módulos solo si los tiempos de compilación lo justifican. Paquetes:
+Dos módulos Gradle (ADR-0007): **`:domain`** (Kotlin/JVM puro: modelos,
+reglas, contratos de proveedor; sin `android.*`) y **`:app`** (Android).
+Paquetes de `:app`:
 
 ```
 io.github.abeleiras.aura
 ├── ui/            Compose: onboarding, record, recordings, note, settings, update
-├── domain/        modelos y casos de uso puros (sin Android), 100 % testeables
 ├── data/
 │   ├── db/        Room: Recording, ProcessingJob, Transcript, Note, NoteType
-│   ├── provider/  AiProvider + GeminiProvider + OpenRouterProvider
+│   ├── provider/  GeminiProvider + OpenRouterProvider (implementan AiProvider)
 │   ├── secrets/   CredentialStore (AES-GCM con clave del Android Keystore)
-│   ├── export/    ExportRepository (SAF), formateadores Markdown/JSON
-│   └── update/    UpdateRepository (GitHub Releases, descarga, verificación)
+│   ├── export/    ExportRepository (SAF)
+│   └── update/    UpdateRepository (descarga, verificación, PackageInstaller)
 ├── recording/     RecordingService, AudioRecorderEngine, CallStateMonitor  (portado de Aura)
 ├── work/          ProcessingWorker, ExportWorker
 ├── tile/ widget/  (portados de Aura)
-└── di/            Hilt
+└── AppContainer   dependencias (ADR-0008)
 ```
+
+Paquetes de `:domain` (`io.github.abeleiras.aura.domain`): `notes`
+(tipos, clasificador, render y rutas de exportación), `transcript`
+(modelo y hablantes), `processing` (política de reintentos, `AiProvider`,
+`NoteDrafter`), `update` (semver, selección de actualización, SHA-256).
 
 ## Stack
 
 | Área | Elección | Motivo |
 |---|---|---|
 | Lenguaje / UI | Kotlin, Jetpack Compose, Material 3 | Igual que Aura |
-| DI | Hilt | Igual que Aura |
+| DI | `AppContainer` manual (ADR-0008) | Grafo pequeño; sin Hilt/KSP salvo Room |
 | Persistencia | Room (+ DataStore para preferencias) | Notas buscables, estados de trabajos |
 | Segundo plano | Servicio en primer plano (grabar), WorkManager (procesar, exportar) | Sobrevive a cierres y espera red |
 | Red | OkHttp + kotlinx.serialization | Sin Retrofit: pocas llamadas, menos dependencias |

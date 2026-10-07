@@ -99,7 +99,9 @@ estado, y poder escucharlas, para saber qué tengo.
   una notificación fija no descartable que lo indique, con acciones de
   pausar/reanudar y parar. (Constitución V)
 - **FR-001-03**: La app DEBE ofrecer un mosaico de Ajustes rápidos y un widget
-  de pantalla de inicio que inicien/paren la grabación y reflejen su estado.
+  de pantalla de inicio que inicien/paren la grabación y reflejen su estado
+  (inactivo / grabando / en pausa). No se anima el icono cuadro a cuadro: sería
+  un gasto de batería continuo sin aportar información.
 - **FR-001-04**: El formato de grabación DEBE ser Opus en contenedor OGG,
   mono, con dos calidades seleccionables: "Normal" (~32 kbps) y "Alta"
   (~64 kbps); por defecto "Normal".
@@ -143,7 +145,12 @@ estado, y poder escucharlas, para saber qué tengo.
 
 ## Preguntas abiertas
 
-- ¿Mantener el límite de almacenamiento local de Aura (borrar las más
-  antiguas)? Propuesta: ya no tiene sentido como límite automático, porque
-  las grabaciones no son "pendientes de subir" sino el archivo del usuario;
-  sustituirlo por un aviso cuando ocupen más de X GB. Decidir en el plan.
+- ~~¿Mantener el límite de almacenamiento local de Aura?~~ **Resuelta
+  (2026-10-06):** no hay borrado automático. Las grabaciones son el archivo del
+  usuario. La lista de grabaciones muestra el espacio total y, por encima de
+  2 GB, un aviso que sugiere exportar y borrar (`RecordingPolicy.LARGE_ARCHIVE_BYTES`).
+- ~~Formato~~ **Aclaración (2026-10-06):** el código actual de Aura graba WAV
+  sin comprimir (decisión de su autor, para tener MP3/WAV); esta spec mantiene
+  Opus/OGG (FR-001-04) porque un WAV a 44,1 kHz son ~300 MB/h frente a ~14 MB/h,
+  y porque las subidas a proveedores de IA deben ser pequeñas. Si algún
+  proveedor exige otro formato, la conversión es cosa de su cliente (spec 003).
