@@ -36,7 +36,7 @@ funciones.
 
 - [ ] Spikes: callback PKCE de OpenRouter; límites de audio en OpenRouter;
       calidad de diarización de Gemini en es y gl.
-- [ ] **002** Configuración inicial con Gemini y "Solo grabar".
+- [ ] **002** Configuración inicial con Gemini y "Solo grabar". *Asistente, clave cifrada y comprobación listos; faltan aviso en principal, modelos avanzados y prueba con clave real.*
 - [ ] **005** Tipos predefinidos (HU-005-1).
 - [ ] **003** Procesado completo con Gemini.
 - [ ] **004** Vista de nota, renombrar/unir hablantes, compartir, búsqueda,

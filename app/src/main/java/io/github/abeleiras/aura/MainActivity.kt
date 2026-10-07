@@ -33,9 +33,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.github.abeleiras.aura.ui.main.MainScreen
 import io.github.abeleiras.aura.ui.main.MainViewModel
+import io.github.abeleiras.aura.ui.onboarding.OnboardingScreen
 import io.github.abeleiras.aura.ui.permissions.BatteryOptimizationDialog
 import io.github.abeleiras.aura.ui.permissions.PermissionDeniedDialog
 import io.github.abeleiras.aura.ui.permissions.PermissionRationaleDialog
+import io.github.abeleiras.aura.ui.provider.ProviderScreen
 import io.github.abeleiras.aura.ui.recordings.RecordingsScreen
 import io.github.abeleiras.aura.ui.recordings.RecordingsViewModel
 import io.github.abeleiras.aura.ui.settings.SettingsScreen
@@ -54,7 +56,9 @@ class MainActivity : ComponentActivity() {
 }
 
 private object Routes {
+    const val ONBOARDING = "onboarding"
     const val MAIN = "main"
+    const val PROVIDER = "provider"
     const val SETTINGS = "settings"
     const val RECORDINGS = "recordings"
 }
@@ -141,7 +145,22 @@ private fun AuraApp(versionName: String) {
         onPauseOrDispose { }
     }
 
-    NavHost(navController = navController, startDestination = Routes.MAIN) {
+    NavHost(
+        navController = navController,
+        startDestination = if (container.settings.onboardingDone) Routes.MAIN else Routes.ONBOARDING,
+    ) {
+        composable(Routes.ONBOARDING) {
+            OnboardingScreen(
+                settings = container.settings,
+                provider = container.provider,
+                onFinished = {
+                    navController.navigate(Routes.MAIN) { popUpTo(Routes.ONBOARDING) { inclusive = true } }
+                },
+            )
+        }
+        composable(Routes.PROVIDER) {
+            ProviderScreen(controller = container.provider, onBackClick = { navController.popBackStack() })
+        }
         composable(Routes.MAIN) {
             MainScreen(
                 viewModel = mainViewModel,
@@ -155,7 +174,7 @@ private fun AuraApp(versionName: String) {
             RecordingsScreen(viewModel = recordingsViewModel, onBackClick = { navController.popBackStack() })
         }
         composable(Routes.SETTINGS) {
-            SettingsScreen(settings = container.settings, updates = container.updates, exports = container.exports, recordings = container.recordings, versionName = versionName, onBackClick = { navController.popBackStack() })
+            SettingsScreen(settings = container.settings, updates = container.updates, exports = container.exports, recordings = container.recordings, versionName = versionName, provider = container.provider, onProcessingClick = { navController.navigate(Routes.PROVIDER) }, onBackClick = { navController.popBackStack() })
         }
     }
 }

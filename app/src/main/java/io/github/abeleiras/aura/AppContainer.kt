@@ -4,6 +4,8 @@ import android.content.Context
 import android.util.Log
 import androidx.room.Room
 import io.github.abeleiras.aura.data.RecordingRepository
+import io.github.abeleiras.aura.data.ai.CredentialStore
+import io.github.abeleiras.aura.data.ai.ProviderController
 import io.github.abeleiras.aura.data.db.AuraDatabase
 import io.github.abeleiras.aura.data.export.ExportRepository
 import io.github.abeleiras.aura.data.update.UpdateController
@@ -51,6 +53,10 @@ class AppContainer(private val context: Context) {
             .readTimeout(60, TimeUnit.SECONDS)
             .build()
     }
+
+    val credentials by lazy { CredentialStore(appContext) }
+
+    val provider by lazy { ProviderController(settings, credentials, http, appScope) }
 
     val updates by lazy {
         val releases = ReleasesClient(http)

@@ -2,9 +2,11 @@ package io.github.abeleiras.aura.data.prefs
 
 import android.content.Context
 import androidx.core.content.edit
+import io.github.abeleiras.aura.domain.ai.CredentialState
+import io.github.abeleiras.aura.domain.ai.ProcessingMode
 import io.github.abeleiras.aura.domain.recording.AudioQuality
 
-/** Non-sensitive preferences. Credentials will live elsewhere (spec 002, FR-002-05). */
+/** Non-sensitive preferences. Credentials live in [io.github.abeleiras.aura.data.ai.CredentialStore] (FR-002-05). */
 class AppSettings(context: Context) {
     private val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
 
@@ -59,7 +61,44 @@ class AppSettings(context: Context) {
     @Synchronized
     fun removeExported(fileName: String) = prefs.edit { putStringSet(KEY_EXPORTED, exportedFiles - fileName) }
 
+    var onboardingDone: Boolean
+        get() = prefs.getBoolean(KEY_ONBOARDING_DONE, false)
+        set(value) = prefs.edit { putBoolean(KEY_ONBOARDING_DONE, value) }
+
+    var processingMode: ProcessingMode
+        get() = ProcessingMode.fromNameOrDefault(prefs.getString(KEY_MODE, null))
+        set(value) = prefs.edit { putString(KEY_MODE, value.name) }
+
+    var credentialState: CredentialState
+        get() = CredentialState.fromNameOrDefault(prefs.getString(KEY_CREDENTIAL_STATE, null))
+        set(value) = prefs.edit { putString(KEY_CREDENTIAL_STATE, value.name) }
+
+    var credentialCheckedAtMillis: Long
+        get() = prefs.getLong(KEY_CREDENTIAL_CHECKED, 0L)
+        set(value) = prefs.edit { putLong(KEY_CREDENTIAL_CHECKED, value) }
+
+    /** FR-002-08: the user accepted what Gemini receives. Without it nothing is sent. */
+    var privacyAcceptedGemini: Boolean
+        get() = prefs.getBoolean(KEY_PRIVACY_GEMINI, false)
+        set(value) = prefs.edit { putBoolean(KEY_PRIVACY_GEMINI, value) }
+
+    /** BCP-47 tag chosen by the user; null = follow the system language (FR-002-06). */
+    var primaryLanguage: String?
+        get() = prefs.getString(KEY_LANG_PRIMARY, null)
+        set(value) = prefs.edit { if (value == null) remove(KEY_LANG_PRIMARY) else putString(KEY_LANG_PRIMARY, value) }
+
+    var secondaryLanguage: String?
+        get() = prefs.getString(KEY_LANG_SECONDARY, null)
+        set(value) = prefs.edit { if (value == null) remove(KEY_LANG_SECONDARY) else putString(KEY_LANG_SECONDARY, value) }
+
     private companion object {
+        const val KEY_ONBOARDING_DONE = "onboarding_done"
+        const val KEY_MODE = "processing_mode"
+        const val KEY_CREDENTIAL_STATE = "credential_state"
+        const val KEY_CREDENTIAL_CHECKED = "credential_checked_at"
+        const val KEY_PRIVACY_GEMINI = "privacy_accepted_gemini"
+        const val KEY_LANG_PRIMARY = "language_primary"
+        const val KEY_LANG_SECONDARY = "language_secondary"
         const val KEY_EXPORT_FOLDER = "export_folder_uri"
         const val KEY_EXPORT_FROM = "export_from_millis"
         const val KEY_EXPORTED = "exported_files"

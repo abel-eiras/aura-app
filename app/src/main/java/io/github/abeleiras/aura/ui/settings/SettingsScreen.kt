@@ -44,6 +44,9 @@ import io.github.abeleiras.aura.data.update.UpdateController
 import io.github.abeleiras.aura.ui.update.UpdateCard
 import kotlinx.coroutines.launch
 import io.github.abeleiras.aura.data.RecordingRepository
+import io.github.abeleiras.aura.data.ai.ProviderController
+import io.github.abeleiras.aura.domain.ai.ProcessingMode
+import androidx.compose.material3.OutlinedButton
 import io.github.abeleiras.aura.data.export.ExportRepository
 import io.github.abeleiras.aura.data.prefs.AppSettings
 import io.github.abeleiras.aura.domain.recording.AudioQuality
@@ -56,11 +59,14 @@ fun SettingsScreen(
     exports: ExportRepository,
     recordings: RecordingRepository,
     versionName: String,
+    provider: ProviderController,
+    onProcessingClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
     var quality by remember { mutableStateOf(settings.audioQuality) }
     var autoCheck by remember { mutableStateOf(settings.autoUpdateCheck) }
     var preReleases by remember { mutableStateOf(settings.includePreReleases) }
+    val providerState by provider.state.collectAsStateWithLifecycle()
     val updateState by updates.state.collectAsStateWithLifecycle()
     val exportState by exports.state.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
@@ -95,7 +101,26 @@ fun SettingsScreen(
         },
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(16.dp)) {
-            Text(stringResource(R.string.settings_audio_quality_section), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.settings_processing_section), style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = stringResource(
+                    when (providerState.mode) {
+                        ProcessingMode.GEMINI -> R.string.settings_processing_gemini
+                        ProcessingMode.OPENROUTER -> R.string.settings_processing_openrouter
+                        ProcessingMode.NONE -> R.string.settings_processing_none
+                    },
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+            OutlinedButton(onClick = onProcessingClick, modifier = Modifier.padding(top = 8.dp)) {
+                Text(stringResource(R.string.settings_processing_configure))
+            }
+            Text(
+                stringResource(R.string.settings_audio_quality_section),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(top = 24.dp),
+            )
             Column(modifier = Modifier.selectableGroup().padding(top = 8.dp)) {
                 AudioQuality.entries.forEach { option ->
                     Row(
