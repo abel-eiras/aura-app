@@ -3,6 +3,7 @@ package io.github.abeleiras.aura.domain.notes
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
@@ -65,5 +66,27 @@ class NoteTypeCatalogsTest {
         val problems = assertIs<CatalogParseResult.Invalid>(NoteTypeCatalogs.parse(two)).problems
         assertTrue(problems.any { "predeterminado" in it })
         assertTrue(problems.any { "Identificador no válido" in it })
+    }
+
+    // FR-005-01, HU-005-1 scenario 2
+    @Test
+    fun `translated defaults keep ids, tags and default flag and translate the rest`() {
+        val es = NoteTypeCatalogs.defaults("es").types
+        listOf("en", "gl").forEach { lang ->
+            val translated = NoteTypeCatalogs.defaults(lang).types
+            assertEquals(es.map { it.id }, translated.map { it.id })
+            assertEquals(es.map { it.tag }, translated.map { it.tag })
+            assertEquals(es.map { it.isDefault }, translated.map { it.isDefault })
+            translated.zip(es).forEach { (t, base) ->
+                assertNotEquals(base.criterion, t.criterion, "$lang criterion of ${t.id}")
+                assertNotEquals(base.draftingPrompt, t.draftingPrompt, "$lang prompt of ${t.id}")
+                assertTrue("same language as the transcript" in t.draftingPrompt || "mesmo idioma" in t.draftingPrompt, "FR-005-07 $lang ${t.id}")
+            }
+        }
+    }
+
+    @Test
+    fun `unknown language falls back to Spanish`() {
+        assertEquals(NoteTypeCatalogs.defaults("es"), NoteTypeCatalogs.defaults("fr"))
     }
 }
