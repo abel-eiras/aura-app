@@ -13,6 +13,7 @@ import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.PauseCircle
 import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.StopCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -68,6 +69,7 @@ fun MainScreen(
                 status = status,
                 onToggleRecording = onToggleRecording,
                 onTogglePause = viewModel::togglePause,
+                onStop = viewModel::stopRecording,
             )
         }
     }
@@ -79,6 +81,7 @@ private fun MainContent(
     status: RecordingStatus,
     onToggleRecording: () -> Unit,
     onTogglePause: () -> Unit,
+    onStop: () -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -97,14 +100,23 @@ private fun MainContent(
         )
         if (status.isActive) {
             val paused = status is RecordingStatus.Paused
-            IconButton(onClick = onTogglePause, modifier = Modifier.padding(top = 16.dp)) {
-                Icon(
-                    imageVector = if (paused) Icons.Outlined.PlayCircle else Icons.Outlined.PauseCircle,
-                    contentDescription = stringResource(
-                        if (paused) R.string.content_description_resume else R.string.content_description_pause,
-                    ),
-                    modifier = Modifier.size(40.dp),
-                )
+            Row(modifier = Modifier.padding(top = 16.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                IconButton(onClick = onTogglePause) {
+                    Icon(
+                        imageVector = if (paused) Icons.Outlined.PlayCircle else Icons.Outlined.PauseCircle,
+                        contentDescription = stringResource(
+                            if (paused) R.string.content_description_resume else R.string.content_description_pause,
+                        ),
+                        modifier = Modifier.size(40.dp),
+                    )
+                }
+                IconButton(onClick = onStop) {
+                    Icon(
+                        imageVector = Icons.Outlined.StopCircle,
+                        contentDescription = stringResource(R.string.content_description_stop),
+                        modifier = Modifier.size(40.dp),
+                    )
+                }
             }
         }
     }

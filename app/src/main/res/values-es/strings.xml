@@ -111,4 +111,5 @@
     <string name="crash_share">Compartir</string>
     <string name="crash_close">Cerrar</string>
     <string name="crash_copied">Copiado</string>
+    <string name="content_description_stop">Parar y guardar la grabación</string>
 </resources>
