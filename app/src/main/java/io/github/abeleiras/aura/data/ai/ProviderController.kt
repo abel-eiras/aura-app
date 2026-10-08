@@ -137,7 +137,7 @@ class ProviderController(
 
     private fun autoSelect(models: List<GeminiModel>) {
         if (settings.modelsCustomized) return
-        ModelPicker.bestFlash(models)?.let {
+        ModelPicker.bestForFreeTier(models)?.let {
             settings.transcribeModel = it
             settings.draftModel = it
         }

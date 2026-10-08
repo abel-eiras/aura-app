@@ -45,6 +45,7 @@ La capa gratuita de Gemini permite, para el modelo probado, unas **5 peticiones 
 - Clasificar y redactar van en **una sola petición** (`NoteDrafter.runCombined`): el modelo ve el criterio de cada tipo, elige uno y redacta con las instrucciones de ese tipo; responde un JSON `{type, note}`. FR-003-05 se mantiene (la elección usa solo el criterio). Si algún tipo define su propio `modelo`, se usan las dos peticiones separadas, porque el modelo depende del tipo elegido. "Cambiar tipo" sigue siendo una sola petición (redactar).
 - Resultado: 2 peticiones por grabación (unas 10 al día).
 - `GeminiProvider` espacia las llamadas al menos 13 s para no superar las 5 por minuto.
+- **Modelo por defecto = Flash-Lite** (`ModelPicker.bestForFreeTier`): en la página de límites de una clave real, Gemini 3.8 Flash tenía 20 peticiones/día y 5/min, mientras que 3.1 y 3.5 Flash Lite tenían 500/día y 15/min (y Gemma 4, 14.400/día pero solo 16K tokens/min, además de ser un modelo de solo texto y por tanto inútil para transcribir). La calidad de Lite en diarización y gallego **no está medida**; si no basta, Ajustes → Procesado → Avanzado permite elegir otro modelo.
 - Los límites los pone Google y pueden cambiar; la app no los conoce de antemano, solo reacciona al 429 (cuota agotada → reintento automático cuando se renueva).
 
 ## Spikes pendientes (bloquean el plan de los clientes)
