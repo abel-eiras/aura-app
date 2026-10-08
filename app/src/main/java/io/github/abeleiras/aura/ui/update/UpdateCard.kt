@@ -9,11 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +22,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.github.abeleiras.aura.R
+import io.github.abeleiras.aura.ui.components.AuraTextButton
+import io.github.abeleiras.aura.ui.components.AuraAttentionCard
 import io.github.abeleiras.aura.data.update.ApkInstaller
 import io.github.abeleiras.aura.data.update.UpdateUiState
 import io.github.abeleiras.aura.domain.update.AvailableUpdate
@@ -47,7 +47,7 @@ fun UpdateCard(
 
     val quiet = state is UpdateUiState.Idle || state is UpdateUiState.Checking || state is UpdateUiState.UpToDate
     if (!quiet || (showQuietStates && state !is UpdateUiState.Idle)) {
-        Card(modifier = modifier.fillMaxWidth()) {
+        AuraAttentionCard(modifier = modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
                 when (state) {
                     UpdateUiState.Idle -> Unit
@@ -56,9 +56,9 @@ fun UpdateCard(
                     is UpdateUiState.Available -> {
                         Message(R.string.update_available, state.update.version.toString())
                         Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-                            if (onDismiss != null) TextButton(onClick = onDismiss) { Text(stringResource(R.string.update_later)) }
-                            TextButton(onClick = { showNotes = state.update }) { Text(stringResource(R.string.update_whats_new)) }
-                            TextButton(onClick = onUpdate) { Text(stringResource(R.string.update_install)) }
+                            if (onDismiss != null) AuraTextButton(onClick = onDismiss) { Text(stringResource(R.string.update_later)) }
+                            AuraTextButton(onClick = { showNotes = state.update }) { Text(stringResource(R.string.update_whats_new)) }
+                            AuraTextButton(onClick = onUpdate) { Text(stringResource(R.string.update_install)) }
                         }
                     }
                     is UpdateUiState.Downloading -> {
@@ -75,7 +75,7 @@ fun UpdateCard(
                     is UpdateUiState.NeedsInstallPermission -> {
                         Message(R.string.update_needs_permission)
                         Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-                            TextButton(onClick = { context.startActivity(ApkInstaller.permissionSettingsIntent(context)) }) {
+                            AuraTextButton(onClick = { context.startActivity(ApkInstaller.permissionSettingsIntent(context)) }) {
                                 Text(stringResource(R.string.update_open_settings))
                             }
                         }
@@ -84,14 +84,14 @@ fun UpdateCard(
                     is UpdateUiState.BlockedByRecording -> {
                         Message(R.string.update_blocked_by_recording)
                         Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-                            TextButton(onClick = onUpdate) { Text(stringResource(R.string.update_try_again)) }
+                            AuraTextButton(onClick = onUpdate) { Text(stringResource(R.string.update_try_again)) }
                         }
                     }
                     is UpdateUiState.Failed -> {
                         Message(failureText(state.failure))
                         if (state.update != null) {
                             Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-                                TextButton(onClick = onUpdate) { Text(stringResource(R.string.update_try_again)) }
+                                AuraTextButton(onClick = onUpdate) { Text(stringResource(R.string.update_try_again)) }
                             }
                         }
                     }
@@ -110,12 +110,12 @@ fun UpdateCard(
                 }
             },
             confirmButton = {
-                TextButton(onClick = {
+                AuraTextButton(onClick = {
                     showNotes = null
                     onUpdate()
                 }) { Text(stringResource(R.string.update_install)) }
             },
-            dismissButton = { TextButton(onClick = { showNotes = null }) { Text(stringResource(R.string.update_close)) } },
+            dismissButton = { AuraTextButton(onClick = { showNotes = null }) { Text(stringResource(R.string.update_close)) } },
         )
     }
 }

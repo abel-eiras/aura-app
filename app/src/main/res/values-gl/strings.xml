@@ -22,14 +22,10 @@
     <string name="notification_alerts_channel_description">Avisos como quedar sen espazo</string>
     <string name="notification_low_storage_title">Gravación detida: pouco espazo</string>
     <string name="notification_low_storage_text">Ao teléfono case non lle queda espazo. O gravado ata agora conserváronse. Libera espazo antes de volver gravar.</string>
-    <string name="status_idle_ready">Toca o círculo para gravar</string>
-    <string name="status_recording">Gravando · %1$s</string>
-    <string name="status_paused">En pausa · %1$s</string>
+    <string name="status_idle_ready">Toca o cadrado para gravar</string>
     <string name="content_description_settings">Axustes</string>
     <string name="content_description_recordings">Gravacións</string>
     <string name="content_description_back">Atrás</string>
-    <string name="content_description_pause">Pausar gravación</string>
-    <string name="content_description_resume">Retomar gravación</string>
     <string name="permission_rationale_title">Aura precisa algúns permisos</string>
     <string name="permission_rationale_body">Micrófono: para gravar. Notificacións: para que vexas sempre cando está gravando Aura. Estado do teléfono (opcional): para que a gravación se poña en pausa soa durante unha chamada. Podes dicir que non aos dous últimos e Aura gravará igual.</string>
     <string name="permission_rationale_continue">Continuar</string>
@@ -227,4 +223,13 @@
     <string name="processing_error_model">O modelo xa non está dispoñible. Escolle outro en Axustes → Procesado → Avanzado.</string>
     <string name="provider_models_available">Dispoñibles para a túa chave: %1$s</string>
     <string name="processing_waiting_quota">Cota gratuíta esgotada; Aura tentarao soa cando se renove.</string>
+    <string name="brand_by">by Formula Farma</string>
+    <string name="main_tag_idle">● LISTO</string>
+    <string name="main_tag_recording">● GRAVANDO</string>
+    <string name="main_tag_paused">EN PAUSA</string>
+    <string name="main_hint_active">Podes bloquear o móbil. Aura segue gravando.</string>
+    <string name="main_pause">Pausar</string>
+    <string name="main_resume">Reanudar</string>
+    <string name="main_stop">Parar e gardar</string>
+    <string name="content_description_record">Comezar a gravar</string>
 </resources>

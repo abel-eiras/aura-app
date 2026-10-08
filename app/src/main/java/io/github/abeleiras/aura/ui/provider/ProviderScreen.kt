@@ -10,10 +10,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,6 +28,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.abeleiras.aura.R
+import io.github.abeleiras.aura.ui.components.AuraOutlinedButton
+import io.github.abeleiras.aura.ui.components.AuraButton
 import io.github.abeleiras.aura.domain.ai.ProcessingMode
 import io.github.abeleiras.aura.data.ai.ProviderController
 
@@ -83,8 +83,8 @@ private fun AdvancedModels(controller: ProviderController) {
             Text(stringResource(R.string.provider_models_available, state.models.take(8).joinToString(", ")), style = MaterialTheme.typography.bodySmall)
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(onClick = { controller.saveModels(transcribe, draft) }) { Text(stringResource(R.string.provider_models_save)) }
-            OutlinedButton(onClick = {
+            AuraButton(onClick = { controller.saveModels(transcribe, draft) }) { Text(stringResource(R.string.provider_models_save)) }
+            AuraOutlinedButton(onClick = {
                 controller.saveModels("", "")
                 transcribe = controller.transcribeModel
                 draft = controller.draftModel // shows the alias until the new check picks a model

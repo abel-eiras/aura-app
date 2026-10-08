@@ -22,14 +22,10 @@
     <string name="notification_alerts_channel_description">Warnings such as running out of storage</string>
     <string name="notification_low_storage_title">Recording stopped: low storage</string>
     <string name="notification_low_storage_text">Your phone is almost out of space. What was recorded so far has been kept. Free up some space before recording again.</string>
-    <string name="status_idle_ready">Tap the circle to record</string>
-    <string name="status_recording">Recording · %1$s</string>
-    <string name="status_paused">Paused · %1$s</string>
+    <string name="status_idle_ready">Tap the square to record</string>
     <string name="content_description_settings">Settings</string>
     <string name="content_description_recordings">Recordings</string>
     <string name="content_description_back">Back</string>
-    <string name="content_description_pause">Pause recording</string>
-    <string name="content_description_resume">Resume recording</string>
     <string name="permission_rationale_title">Aura needs a few permissions</string>
     <string name="permission_rationale_body">Microphone: to record. Notifications: so you can always see when Aura is recording. Phone state (optional): so recording pauses by itself during a call. You can say no to the last two and Aura will still record.</string>
     <string name="permission_rationale_continue">Continue</string>
@@ -227,4 +223,13 @@
     <string name="processing_error_model">The model is no longer available. Pick another one in Settings → Processing → Advanced.</string>
     <string name="provider_models_available">Available to your key: %1$s</string>
     <string name="processing_waiting_quota">Free quota used up; Aura will try again by itself when it renews.</string>
+    <string name="brand_by">by Formula Farma</string>
+    <string name="main_tag_idle">● READY</string>
+    <string name="main_tag_recording">● RECORDING</string>
+    <string name="main_tag_paused">PAUSED</string>
+    <string name="main_hint_active">You can lock the phone. Aura keeps recording.</string>
+    <string name="main_pause">Pause</string>
+    <string name="main_resume">Resume</string>
+    <string name="main_stop">Stop and save</string>
+    <string name="content_description_record">Start recording</string>
 </resources>

@@ -14,15 +14,11 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,6 +36,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.abeleiras.aura.R
+import io.github.abeleiras.aura.ui.components.AuraTextButton
+import io.github.abeleiras.aura.ui.components.AuraOutlinedButton
+import io.github.abeleiras.aura.ui.components.AuraButton
+import io.github.abeleiras.aura.ui.components.AuraCard
 import io.github.abeleiras.aura.data.ai.ProviderController
 import io.github.abeleiras.aura.data.ai.ProviderState
 import io.github.abeleiras.aura.domain.ai.CredentialCheck
@@ -65,7 +65,7 @@ fun ProviderSetup(controller: ProviderController, modifier: Modifier = Modifier)
         if (state.mode == ProcessingMode.GEMINI) {
             GeminiStep(controller, state)
             if (state.hasKey) {
-                OutlinedButton(onClick = { confirmDisconnect = true }) { Text(stringResource(R.string.provider_disconnect)) }
+                AuraOutlinedButton(onClick = { confirmDisconnect = true }) { Text(stringResource(R.string.provider_disconnect)) }
             }
         }
     }
@@ -76,12 +76,12 @@ fun ProviderSetup(controller: ProviderController, modifier: Modifier = Modifier)
             title = { Text(stringResource(R.string.provider_disconnect_title)) },
             text = { Text(stringResource(R.string.provider_disconnect_body)) },
             confirmButton = {
-                TextButton(onClick = {
+                AuraTextButton(onClick = {
                     confirmDisconnect = false
                     controller.disconnect()
                 }) { Text(stringResource(R.string.provider_disconnect)) }
             },
-            dismissButton = { TextButton(onClick = { confirmDisconnect = false }) { Text(stringResource(R.string.provider_cancel)) } },
+            dismissButton = { AuraTextButton(onClick = { confirmDisconnect = false }) { Text(stringResource(R.string.provider_cancel)) } },
         )
     }
 }
@@ -130,13 +130,13 @@ private fun GeminiStep(controller: ProviderController, state: ProviderState) {
         Text("1. " + stringResource(R.string.gemini_step_1))
         Text("2. " + stringResource(R.string.gemini_step_2))
         Text("3. " + stringResource(R.string.gemini_step_3))
-        Button(onClick = { context.openUrl(ProviderDefaults.GEMINI_KEYS_URL) }) { Text(stringResource(R.string.gemini_open_studio)) }
+        AuraButton(onClick = { context.openUrl(ProviderDefaults.GEMINI_KEYS_URL) }) { Text(stringResource(R.string.gemini_open_studio)) }
 
         if (state.hasKey) {
             Text(stringResource(R.string.gemini_key_saved, state.keyHint.orEmpty()), style = MaterialTheme.typography.bodyMedium)
         }
         clipboardKey?.takeIf { it != input }?.let { found ->
-            OutlinedButton(onClick = {
+            AuraOutlinedButton(onClick = {
                 input = found
                 clipboardKey = null
             }) { Text(stringResource(R.string.gemini_paste_detected)) }
@@ -151,14 +151,14 @@ private fun GeminiStep(controller: ProviderController, state: ProviderState) {
             modifier = Modifier.fillMaxWidth(),
         )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(
+            AuraButton(
                 enabled = input.isNotBlank() && !state.checking,
                 onClick = {
                     if (controller.saveAndCheck(input)) input = ""
                 },
             ) { Text(stringResource(if (state.checking) R.string.gemini_checking else R.string.gemini_check)) }
             if (state.hasKey && input.isBlank()) {
-                OutlinedButton(enabled = !state.checking, onClick = controller::check) { Text(stringResource(R.string.gemini_check_again)) }
+                AuraOutlinedButton(enabled = !state.checking, onClick = controller::check) { Text(stringResource(R.string.gemini_check_again)) }
             }
         }
         if (state.saveFailed) Text(stringResource(R.string.gemini_save_failed), color = MaterialTheme.colorScheme.error)
@@ -195,11 +195,11 @@ private fun CredentialStatus(state: ProviderState) {
 @Composable
 private fun PrivacyNotice(controller: ProviderController, state: ProviderState) {
     val context = LocalContext.current
-    Card(modifier = Modifier.fillMaxWidth()) {
+    AuraCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(stringResource(R.string.privacy_gemini_title), style = MaterialTheme.typography.titleSmall)
             Text(stringResource(R.string.privacy_gemini_body), style = MaterialTheme.typography.bodyMedium)
-            TextButton(onClick = { context.openUrl(ProviderDefaults.GEMINI_TERMS_URL) }) { Text(stringResource(R.string.privacy_policy_link)) }
+            AuraTextButton(onClick = { context.openUrl(ProviderDefaults.GEMINI_TERMS_URL) }) { Text(stringResource(R.string.privacy_policy_link)) }
             Row(
                 modifier = Modifier.fillMaxWidth().selectable(
                     selected = state.privacyAccepted,

@@ -13,8 +13,8 @@ import io.github.abeleiras.aura.domain.recording.RecordingStatus
 import io.github.abeleiras.aura.recording.RecordingService
 
 /**
- * Home-screen widget: just the Aura logo, tinted by state (grey idle, violet recording, light
- * violet paused). Tapping toggles recording like the tile (FR-001-03). The service calls
+ * Home-screen widget: the Aura logo on a square that changes with the state (lime idle, purple
+ * recording, grey paused). Tapping toggles recording like the tile (FR-001-03). The service calls
  * [refresh] on every state change.
  */
 class AuraWidgetProvider : AppWidgetProvider() {
@@ -36,26 +36,28 @@ class AuraWidgetProvider : AppWidgetProvider() {
 
     companion object {
         private const val ACTION_TOGGLE = "io.github.abeleiras.aura.action.WIDGET_TOGGLE"
-        private const val COLOR_IDLE = 0xFF9AA0AC.toInt()
-        private const val COLOR_RECORDING = 0xFF6E5BFF.toInt()
-        private const val COLOR_PAUSED = 0xFF9C8CFF.toInt()
+        private const val LOGO_ON_LIME = 0xFF0D0D0D.toInt()
+        private const val LOGO_ON_PURPLE = 0xFFFFFFFF.toInt()
 
         fun refresh(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
             val ids = manager.getAppWidgetIds(ComponentName(context, AuraWidgetProvider::class.java))
             if (ids.isEmpty()) return
 
-            val color = when (context.container.recordingStateHolder.status.value) {
-                RecordingStatus.Idle -> COLOR_IDLE
-                is RecordingStatus.Recording -> COLOR_RECORDING
-                is RecordingStatus.Paused -> COLOR_PAUSED
+            val status = context.container.recordingStateHolder.status.value
+            val background = when (status) {
+                RecordingStatus.Idle -> R.drawable.widget_bg_idle
+                is RecordingStatus.Recording -> R.drawable.widget_bg_recording
+                is RecordingStatus.Paused -> R.drawable.widget_bg_paused
             }
+            val color = if (status is RecordingStatus.Recording) LOGO_ON_PURPLE else LOGO_ON_LIME
             val toggle = PendingIntent.getBroadcast(
                 context, 0,
                 Intent(context, AuraWidgetProvider::class.java).setAction(ACTION_TOGGLE),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
             val views = RemoteViews(context.packageName, R.layout.widget_aura).apply {
+                setInt(R.id.widget_root, "setBackgroundResource", background)
                 setInt(R.id.widget_image, "setColorFilter", color)
                 setOnClickPendingIntent(R.id.widget_image, toggle)
             }

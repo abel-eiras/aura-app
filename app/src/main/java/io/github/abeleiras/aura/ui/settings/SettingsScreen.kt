@@ -24,7 +24,6 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,13 +39,14 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.abeleiras.aura.R
+import io.github.abeleiras.aura.ui.components.AuraTextButton
+import io.github.abeleiras.aura.ui.components.AuraOutlinedButton
 import io.github.abeleiras.aura.data.update.UpdateController
 import io.github.abeleiras.aura.ui.update.UpdateCard
 import kotlinx.coroutines.launch
 import io.github.abeleiras.aura.data.RecordingRepository
 import io.github.abeleiras.aura.data.ai.ProviderController
 import io.github.abeleiras.aura.domain.ai.ProcessingMode
-import androidx.compose.material3.OutlinedButton
 import io.github.abeleiras.aura.data.export.ExportRepository
 import io.github.abeleiras.aura.data.prefs.AppSettings
 import io.github.abeleiras.aura.domain.recording.AudioQuality
@@ -114,7 +114,7 @@ fun SettingsScreen(
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(top = 4.dp),
             )
-            OutlinedButton(onClick = onProcessingClick, modifier = Modifier.padding(top = 8.dp)) {
+            AuraOutlinedButton(onClick = onProcessingClick, modifier = Modifier.padding(top = 8.dp)) {
                 Text(stringResource(R.string.settings_processing_configure))
             }
             if (providerState.mode != ProcessingMode.NONE) {
@@ -195,25 +195,30 @@ fun SettingsScreen(
                 Text(stringResource(R.string.settings_export_running), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 4.dp))
             }
             Row(modifier = Modifier.padding(top = 4.dp)) {
-                TextButton(onClick = { folderPicker.launch(null) }) {
+                AuraTextButton(onClick = { folderPicker.launch(null) }) {
                     Text(stringResource(if (exportState.folderConfigured) R.string.settings_export_change else R.string.settings_export_choose))
                 }
                 if (exportState.folderConfigured) {
-                    TextButton(onClick = { scope.launch { exports.clearFolder() } }) {
+                    AuraTextButton(onClick = { scope.launch { exports.clearFolder() } }) {
                         Text(stringResource(R.string.settings_export_stop))
                     }
                 }
             }
             if (exportState.folderConfigured && !exportState.permissionLost) {
                 Row {
-                    TextButton(onClick = { scope.launch { exports.exportPending() } }) { Text(stringResource(R.string.settings_export_retry)) }
-                    TextButton(onClick = { scope.launch { exports.exportAllNow() } }) { Text(stringResource(R.string.settings_export_all)) }
+                    AuraTextButton(onClick = { scope.launch { exports.exportPending() } }) { Text(stringResource(R.string.settings_export_retry)) }
+                    AuraTextButton(onClick = { scope.launch { exports.exportAllNow() } }) { Text(stringResource(R.string.settings_export_all)) }
                 }
             }
             Text(
                 text = stringResource(R.string.settings_about_section),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(top = 24.dp),
+            )
+            Text(
+                text = stringResource(R.string.app_name) + " " + stringResource(R.string.brand_by),
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(top = 8.dp),
             )
             Text(
                 text = stringResource(R.string.settings_version, versionName),
@@ -228,7 +233,7 @@ fun SettingsScreen(
                 preReleases = it
                 settings.includePreReleases = it
             }
-            TextButton(onClick = updates::checkNow, modifier = Modifier.padding(top = 4.dp)) {
+            AuraTextButton(onClick = updates::checkNow, modifier = Modifier.padding(top = 4.dp)) {
                 Text(stringResource(R.string.settings_update_check_now))
             }
             UpdateCard(
@@ -275,11 +280,11 @@ private fun ExistingRecordingsDialog(count: Int, onExportAll: () -> Unit, onOnly
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.export_existing_title)) },
         text = { Text(stringResource(R.string.export_existing_body, count)) },
-        confirmButton = { TextButton(onClick = onExportAll) { Text(stringResource(R.string.export_existing_yes)) } },
+        confirmButton = { AuraTextButton(onClick = onExportAll) { Text(stringResource(R.string.export_existing_yes)) } },
         dismissButton = {
             Row {
-                TextButton(onClick = onDismiss) { Text(stringResource(R.string.recordings_cancel)) }
-                TextButton(onClick = onOnlyNew) { Text(stringResource(R.string.export_existing_no)) }
+                AuraTextButton(onClick = onDismiss) { Text(stringResource(R.string.recordings_cancel)) }
+                AuraTextButton(onClick = onOnlyNew) { Text(stringResource(R.string.export_existing_no)) }
             }
         },
     )
