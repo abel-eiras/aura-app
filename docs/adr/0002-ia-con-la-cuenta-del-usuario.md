@@ -45,3 +45,7 @@ Opciones consideradas:
 - Hay que gestionar errores y cuotas de dos APIs externas.
 - La arquitectura define una interfaz de proveedor para poder añadir
   procesado en dispositivo u otros proveedores sin tocar el resto.
+
+## Actualización 2026-10-08
+
+Se descarta OpenRouter como proveedor alternativo: es de pago por uso y el proyecto busca una vía gratuita para el usuario. El único proveedor es Gemini con la clave gratuita del usuario (AI Studio). La exportación a una carpeta de Google Drive, elegida con el selector del sistema, cubre la sincronización con gestores de notas y chatbots con conector de Drive.

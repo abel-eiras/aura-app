@@ -32,19 +32,16 @@ funciones.
       la hubiera ejecutado y se cerraba al abrir (faltaba `INTERNET`). Ahora cada commit abre
       el APK release en un emulador.
 
-## Hito 2 — Notas con IA (v0.5.0)
+## Hito 2 — Notas con IA (v0.3.0)
 
-- [ ] Spikes: callback PKCE de OpenRouter; límites de audio en OpenRouter;
-      calidad de diarización de Gemini en es y gl.
-- [ ] **002** Configuración inicial con Gemini y "Solo grabar". *Asistente, clave cifrada, comprobación, aviso y modelos avanzados listos; falta la prueba con una clave real (T002-13) y el idioma de la interfaz.*
-- [ ] **005** Tipos predefinidos (HU-005-1).
-- [ ] **003** Procesado completo con Gemini.
-- [ ] **004** Vista de nota, renombrar/unir hablantes, compartir, búsqueda,
-      exportación de transcripción y nota.
+- [x] Spikes: Gemini acepta Opus-en-OGG y separa hablantes (probado con una clave real). Pendiente: calidad en gallego y con grabaciones largas.
+- [x] **002** Configuración inicial con Gemini y "Solo grabar". *Probado con una clave real. Falta elegir el idioma de la interfaz (T002-11) y la guía con capturas.*
+- [x] **005** Tipos predefinidos en es/gl/en (HU-005-1).
+- [x] **003** Procesado completo con Gemini. *Funciona con una clave real; falta medir calidad en gallego y con grabaciones largas (T003-14).*
+- [~] **004** Hecho: vista de nota, renombrar/unir hablantes, compartir y exportación automática de transcripción y nota a una carpeta (también de Google Drive, probado en un Pixel 10 Pro). Falta: búsqueda y filtros, reproducir desde un segmento.
 
 ## Hito 3 — Para amigos (v1.0.0)
 
-- [ ] **002** OpenRouter (HU-002-3).
 - [ ] **004** "Abrir en…" (HU-004-4).
 - [ ] **006** Página de instalación con QR y guía con capturas (FR-006-09).
 - [ ] Prueba con 5 personas no técnicas contra CE-002-1 y CE-006-1…2.

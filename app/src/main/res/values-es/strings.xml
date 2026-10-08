@@ -122,8 +122,6 @@
     <string name="provider_mode_question">¿Cómo quieres procesar tus grabaciones?</string>
     <string name="provider_mode_gemini">Google Gemini (recomendado)</string>
     <string name="provider_mode_gemini_desc">Gratis dentro de la capa gratuita de Google. Necesitas una clave de Google AI Studio; no hace falta tarjeta.</string>
-    <string name="provider_mode_openrouter">OpenRouter</string>
-    <string name="provider_mode_openrouter_desc">Pago por uso y elección de modelo. Próximamente.</string>
     <string name="provider_mode_none">Solo grabar</string>
     <string name="provider_mode_none_desc">Sin IA. Aura solo graba; tú conservas o exportas el audio.</string>
     <string name="gemini_step_1">Abre Google AI Studio e inicia sesión con tu cuenta de Google.</string>
@@ -139,7 +137,7 @@
     <string name="gemini_save_failed">Este móvil ha rechazado guardar la clave de forma segura. Inténtalo de nuevo o reinicia el móvil.</string>
     <string name="gemini_result_valid">Clave correcta</string>
     <string name="gemini_result_invalid">Esa clave no es válida. Cópiala de nuevo desde AI Studio.</string>
-    <string name="gemini_result_region">Google no ofrece Gemini en tu país con esta clave. Más adelante podrás probar OpenRouter.</string>
+    <string name="gemini_result_region">Google no ofrece Gemini en tu país con esta clave.</string>
     <string name="gemini_result_rate_limited">La clave funciona, pero su cuota está agotada por ahora. Inténtalo más tarde.</string>
     <string name="gemini_result_network">Sin conexión. La clave queda guardada; compruébala cuando tengas conexión.</string>
     <string name="gemini_result_unavailable">El servicio de Google respondió con un error (%1$d). Inténtalo más tarde.</string>
@@ -161,7 +159,6 @@
     <string name="language_none">Ninguno</string>
     <string name="settings_processing_section">Procesado</string>
     <string name="settings_processing_gemini">Google Gemini</string>
-    <string name="settings_processing_openrouter">OpenRouter</string>
     <string name="settings_processing_none">Solo grabar</string>
     <string name="settings_processing_configure">Configurar el procesado</string>
     <string name="processing_channel_name">Procesado</string>

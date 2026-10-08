@@ -1,6 +1,6 @@
 # Especificación: Configuración inicial y proveedores de IA
 
-**ID:** 002 · **Estado:** Aprobada · **Creada:** 2026-10-06
+**ID:** 002 · **Estado:** Implementada (0.3.0) · **Creada:** 2026-10-06
 **Depende de:** —
 
 ## Contexto
@@ -14,12 +14,12 @@ IA**: la persona elige cómo quiere que se procesen sus grabaciones y lo deja
 listo en un par de minutos, sin salir de la app más que para conseguir una
 clave o iniciar sesión.
 
-Hay tres modos de procesado:
+Hay dos modos de procesado (OpenRouter se descartó el 2026-10-08: es de pago por uso y el proyecto busca
+una vía gratuita; ver ADR-0002):
 
 | Modo | Para quién | Qué necesita |
 |---|---|---|
 | **Google Gemini** (recomendado) | La mayoría. Gratis dentro de los límites de la capa gratuita. | Una clave de Google AI Studio (sin tarjeta). |
-| **OpenRouter** | Quien prefiera pagar por uso y elegir modelo (Claude, GPT, Gemini…). | Iniciar sesión en OpenRouter (OAuth, sin copiar claves) y tener créditos. |
 | **Solo grabar** | Quien procese en su PC con aura-transcribe o no quiera IA. | Nada. |
 
 No es posible usar las suscripciones de consumo (Claude Pro, ChatGPT Plus,
@@ -43,7 +43,7 @@ configuración con Gemini sin ayuda en menos de 5 minutos.
    **entonces** veo una bienvenida de una pantalla que explica qué hace la
    app en tres frases y un botón "Empezar".
 2. **Dado** que pulso "Empezar", **cuando** llego a "¿Cómo quieres procesar
-   tus grabaciones?", **entonces** veo los tres modos con una línea de
+   tus grabaciones?", **entonces** veo los dos modos con una línea de
    explicación cada uno, Gemini marcado como recomendado.
 3. **Dado** que elijo un modo y completo su paso, **cuando** termino,
    **entonces** elijo idioma principal (preseleccionado el del sistema) y,
@@ -72,27 +72,7 @@ para no equivocarme.
 4. **Dado** que la clave es correcta, **cuando** continúo, **entonces** veo el
    aviso de privacidad del proveedor (ver FR-002-08) y lo acepto o vuelvo.
 
-### HU-002-3 — Conectar OpenRouter sin copiar claves (P2)
-
-Como usuario de OpenRouter, quiero iniciar sesión y volver a la app ya
-conectado, para no manejar claves.
-
-**Escenarios de aceptación:**
-
-1. **Dado** que elijo OpenRouter, **cuando** pulso "Conectar",
-   **entonces** se abre el navegador en la página de autorización de
-   OpenRouter.
-2. **Dado** que autorizo, **cuando** el navegador vuelve a la app,
-   **entonces** la app obtiene una clave a mi nombre, la guarda cifrada y
-   muestra "Conectado" con mi saldo si el proveedor lo expone.
-3. **Dado** que cancelo o falla la autorización, **cuando** vuelvo,
-   **entonces** la app lo explica y permite reintentar o elegir otro modo.
-4. **Dado** que estoy conectado, **cuando** abro Ajustes → Proveedor,
-   **entonces** puedo elegir el modelo de transcripción y el de redacción de
-   una lista corta recomendada, con opción "Otro" (identificador libre) en
-   Avanzado.
-
-### HU-002-4 — Cambiar o quitar el proveedor más tarde (P2)
+### HU-002-3 — Cambiar o quitar el proveedor más tarde (P2)
 
 Como usuario, quiero cambiar de modo, rotar mi clave o desconectarme desde
 Ajustes, para tener el control.
@@ -121,14 +101,12 @@ Ajustes, para tener el control.
 - **FR-002-01**: En el primer arranque la app DEBE mostrar un asistente:
   bienvenida → modo de procesado → paso del proveedor → idioma(s) →
   pantalla principal. Cada paso DEBE poder saltarse.
-- **FR-002-02**: La app DEBE soportar exactamente tres modos de procesado:
-  Gemini (clave), OpenRouter (OAuth PKCE) y Solo grabar.
+- **FR-002-02**: La app DEBE soportar exactamente dos modos de procesado:
+  Gemini (clave) y Solo grabar.
 - **FR-002-03**: Para Gemini, la app DEBE ofrecer un botón que abra la
   página de creación de claves, detectar en el portapapeles una cadena con
   el formato de clave al volver, y validar la clave con una llamada mínima.
-- **FR-002-04**: Para OpenRouter, la app DEBE implementar el flujo OAuth PKCE
-  (S256) del proveedor y recibir el retorno mediante un enlace que abra la
-  app; DEBE guardar la clave resultante y nunca mostrarla completa.
+- **FR-002-04**: (Retirado: era el inicio de sesión con OpenRouter.)
 - **FR-002-05**: Las credenciales DEBEN almacenarse cifradas con una clave
   del Android Keystore, excluidas de las copias de seguridad y de cualquier
   exportación o log. (Constitución IV)
@@ -150,7 +128,7 @@ Ajustes, para tener el control.
 
 ## Entidades clave
 
-- **Proveedor**: modo (Gemini / OpenRouter / Solo grabar), credencial
+- **Proveedor**: modo (Gemini / Solo grabar), credencial
   (cifrada), estado de la credencial (sin comprobar / correcta / inválida +
   fecha), modelo de transcripción, modelo de redacción, aviso de privacidad
   aceptado (sí/no + fecha).
@@ -160,8 +138,7 @@ Ajustes, para tener el control.
 
 - **CE-002-1**: 4 de cada 5 personas no técnicas completan la configuración
   con Gemini sin ayuda en menos de 5 minutos (prueba con amigos).
-- **CE-002-2**: La conexión con OpenRouter requiere como máximo 3 toques
-  fuera de la app.
+- **CE-002-2**: (Retirado con OpenRouter.)
 - **CE-002-3**: Ninguna credencial aparece en logcat, ficheros exportados ni
   copias de seguridad (verificado por test).
 
@@ -171,19 +148,11 @@ Ajustes, para tener el control.
   esos logins son exclusivos de las apps de cada empresa y reutilizarlos
   viola sus condiciones. La alternativa legítima es el botón "Abrir en…"
   (feature 004).
-- Proveedores adicionales (AssemblyAI, Deepgram, Ollama en red local…):
-  candidatos para el futuro, no en v1.
+- Proveedores adicionales (OpenRouter, AssemblyAI, Deepgram, Ollama en red local…):
+  candidatos para el futuro, no en v1. OpenRouter se descartó por ser de pago por uso.
 - Procesado en el propio dispositivo: candidato para una versión futura
   (ver ROADMAP).
 
 ## Preguntas abiertas
 
-> Hallazgos preliminares (sin verificar) en `docs/spikes/proveedores-ia.md`: para OpenRouter apunta a un
-> *callback* en `http://localhost:<puerto>/callback`, no a un esquema propio.
-
-- ¿Acepta OpenRouter un esquema propio (`aura://`) como `callback_url` del
-  PKCE, o exige `https`? Si exige `https`, haría falta una página puente en
-  GitHub Pages y App Links. Se resuelve con un spike al inicio del plan.
-- Lista corta de modelos recomendados en OpenRouter para transcribir audio
-  (tienen que aceptar audio como entrada): se fija en el plan con pruebas
-  reales en español y gallego.
+Ninguna. Las de OpenRouter (callback del OAuth, modelos con audio) se cerraron al descartar ese proveedor.

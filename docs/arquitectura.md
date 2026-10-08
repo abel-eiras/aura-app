@@ -24,7 +24,7 @@
 └───────────────────────────────┬─────────────────────────────┬───────────────────┘
                                 │ HTTPS, cuenta del usuario   │ HTTPS, 1×/día
                                 ▼                             ▼
-                    Gemini API  /  OpenRouter            GitHub Releases API (006)
+                    Gemini API            GitHub Releases API (006)
 ```
 
 Únicas conexiones salientes: el proveedor de IA elegido (solo al procesar y
@@ -42,7 +42,7 @@ io.github.abeleiras.aura
 ├── ui/            Compose: onboarding, record, recordings, note, settings, update
 ├── data/
 │   ├── db/        Room: Recording, ProcessingJob, Transcript, Note, NoteType
-│   ├── provider/  GeminiProvider + OpenRouterProvider (implementan AiProvider)
+│   ├── provider/  GeminiProvider (implementa AiProvider)
 │   ├── secrets/   CredentialStore (AES-GCM con clave del Android Keystore)
 │   ├── export/    ExportRepository (SAF)
 │   └── update/    UpdateRepository (descarga, verificación, PackageInstaller)
@@ -78,7 +78,7 @@ crash reporting, SDKs propietarios (Constitución III y IV).
 
 ```kotlin
 interface AiProvider {
-    val id: ProviderId                       // GEMINI, OPENROUTER
+    val id: ProviderId                       // GEMINI
     suspend fun validateCredential(): CredentialCheck
     suspend fun transcribe(audio: File, hints: LanguageHints): Transcript   // paso 1
     suspend fun complete(system: String, user: String, model: String?): String // paso 2
@@ -105,13 +105,9 @@ interface AiProvider {
 - Modelos por defecto: el Gemini "Flash" estable vigente para ambos pasos.
   Constante única en `data/provider/Defaults.kt`.
 
-### OpenRouter (a verificar en el plan de 002/003)
+### OpenRouter
 
-- OAuth PKCE: `https://openrouter.ai/auth?callback_url=…&code_challenge=…&code_challenge_method=S256`,
-  intercambio del `code` por una clave en `POST /api/v1/auth/keys`.
-- Paso 1 con un modelo que acepte audio como entrada; paso 2 con cualquiera.
-- Spike pendiente: esquema de `callback_url` admitido y tamaño máximo de
-  audio por petición (ver preguntas abiertas de 002 y 003).
+Descartado (2026-10-08): es de pago por uso. Ver ADR-0002.
 
 ## Máquina de estados del procesado (003)
 
