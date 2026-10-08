@@ -85,7 +85,6 @@ fun OnboardingScreen(settings: AppSettings, provider: ProviderController, onFini
 private fun Welcome() {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.padding(top = 32.dp)) {
         AuraLogo(size = 96.dp)
-        Text(stringResource(R.string.brand_by).uppercase(), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(stringResource(R.string.onboarding_welcome_title), style = MaterialTheme.typography.headlineLarge)
         Text(stringResource(R.string.onboarding_welcome_body), style = MaterialTheme.typography.bodyLarge)
     }

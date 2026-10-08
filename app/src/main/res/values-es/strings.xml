@@ -223,7 +223,6 @@
     <string name="processing_error_model">El modelo ya no está disponible. Elige otro en Ajustes → Procesado → Avanzado.</string>
     <string name="provider_models_available">Disponibles para tu clave: %1$s</string>
     <string name="processing_waiting_quota">Cuota gratuita agotada; Aura lo intentará sola cuando se renueve.</string>
-    <string name="brand_by">by Formula Farma</string>
     <string name="main_tag_idle">● LISTO</string>
     <string name="main_tag_recording">● GRABANDO</string>
     <string name="main_tag_paused">EN PAUSA</string>

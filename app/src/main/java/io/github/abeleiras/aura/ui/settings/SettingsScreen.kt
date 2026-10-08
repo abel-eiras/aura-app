@@ -216,11 +216,6 @@ fun SettingsScreen(
                 modifier = Modifier.padding(top = 24.dp),
             )
             Text(
-                text = stringResource(R.string.app_name) + " " + stringResource(R.string.brand_by),
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.padding(top = 8.dp),
-            )
-            Text(
                 text = stringResource(R.string.settings_version, versionName),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(top = 8.dp),

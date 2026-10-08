@@ -223,7 +223,6 @@
     <string name="processing_error_model">O modelo xa non está dispoñible. Escolle outro en Axustes → Procesado → Avanzado.</string>
     <string name="provider_models_available">Dispoñibles para a túa chave: %1$s</string>
     <string name="processing_waiting_quota">Cota gratuíta esgotada; Aura tentarao soa cando se renove.</string>
-    <string name="brand_by">by Formula Farma</string>
     <string name="main_tag_idle">● LISTO</string>
     <string name="main_tag_recording">● GRAVANDO</string>
     <string name="main_tag_paused">EN PAUSA</string>

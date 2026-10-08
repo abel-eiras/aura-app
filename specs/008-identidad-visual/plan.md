@@ -37,5 +37,5 @@ Sin cambios de comportamiento ni de datos.
 | FR-008-02 | `ui/theme/Type.kt`, `res/font/` |
 | FR-008-04 | `ui/main/MainScreen.kt` (etiqueta y cronómetro) |
 | FR-008-05 | `res/mipmap-anydpi`, `res/drawable-nodpi`, `widget/` |
-| FR-008-06 | `strings.xml` (`brand_by`), README, ajustes, bienvenida |
+| FR-008-06 | `app_name`, README |
 | FR-008-07 | README, constitución, ADR-0005 |
