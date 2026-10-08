@@ -1,6 +1,7 @@
 package io.github.abeleiras.aura.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
@@ -9,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 
 private val LightColors = lightColorScheme(
@@ -61,13 +61,8 @@ private val DarkColors = darkColorScheme(
 )
 
 /** Square corners everywhere: the brutalist look of the Formula Farma site. */
-private val AuraShapes = Shapes(
-    extraSmall = RectangleShape,
-    small = RectangleShape,
-    medium = RectangleShape,
-    large = RectangleShape,
-    extraLarge = RectangleShape,
-)
+private val Square = RoundedCornerShape(0.dp)
+private val AuraShapes = Shapes(extraSmall = Square, small = Square, medium = Square, large = Square, extraLarge = Square)
 
 /** Colours of things that are not Material roles: the accent used for "attention" blocks, and the shadow of raised blocks. */
 data class AuraExtras(val attention: Color, val onAttention: Color, val shadow: Color, val recording: Color, val onRecording: Color)
