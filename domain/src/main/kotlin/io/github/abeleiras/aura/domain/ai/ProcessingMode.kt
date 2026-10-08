@@ -31,8 +31,8 @@ enum class CredentialState {
 object ProviderDefaults {
     // An alias that Google keeps pointing at the current Flash model: a fixed name was retired within weeks
     // (found with 0.3.0-beta.3). After a successful key check the app replaces it with a model the key really has.
-    const val GEMINI_TRANSCRIBE_MODEL = "gemini-flash-latest"
-    const val GEMINI_DRAFT_MODEL = "gemini-flash-latest"
+    const val GEMINI_TRANSCRIBE_MODEL = "gemini-flash-lite-latest"
+    const val GEMINI_DRAFT_MODEL = "gemini-flash-lite-latest"
     const val GEMINI_KEYS_URL = "https://aistudio.google.com/apikey"
     const val GEMINI_TERMS_URL = "https://ai.google.dev/gemini-api/terms"
 }
