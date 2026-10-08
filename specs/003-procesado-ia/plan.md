@@ -39,6 +39,14 @@ paso 2 completo (`NoteDrafter`). Hecho en el hito 2: `GeminiProvider`, `Processi
 - **Notificación** (FR-003-10): "Nota lista: <tipo> — <fecha>" solo si la app no está visible; abre la nota. Desactivable en Ajustes.
 - **Plan B si Gemini rechaza Opus-en-OGG**: un fichero `FAILED` en la Files API produce un error permanente claro; la conversión previa (p. ej. a FLAC/WAV) se añade en `GeminiProvider.transcribe` solo si el spike con `scripts/probe-gemini.sh` lo confirma.
 
+## Ahorro de peticiones (beta.7)
+
+La capa gratuita de Gemini permite, para el modelo probado, unas **5 peticiones por minuto y 20 al día**. Cada grabación gastaba 3 (transcribir, clasificar, redactar), es decir, unas 6 grabaciones al día. Cambios:
+- Clasificar y redactar van en **una sola petición** (`NoteDrafter.runCombined`): el modelo ve el criterio de cada tipo, elige uno y redacta con las instrucciones de ese tipo; responde un JSON `{type, note}`. FR-003-05 se mantiene (la elección usa solo el criterio). Si algún tipo define su propio `modelo`, se usan las dos peticiones separadas, porque el modelo depende del tipo elegido. "Cambiar tipo" sigue siendo una sola petición (redactar).
+- Resultado: 2 peticiones por grabación (unas 10 al día).
+- `GeminiProvider` espacia las llamadas al menos 13 s para no superar las 5 por minuto.
+- Los límites los pone Google y pueden cambiar; la app no los conoce de antemano, solo reacciona al 429 (cuota agotada → reintento automático cuando se renueva).
+
 ## Spikes pendientes (bloquean el plan de los clientes)
 
 1. **Gemini**: subida con Files API + salida JSON estructurada con hablantes; calidad en es/gl; tamaño máximo; qué errores devuelve por cuota (para clasificar transitorio/permanente).

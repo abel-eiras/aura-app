@@ -18,3 +18,4 @@
 - [x] T003-15 Detalle técnico del error visible y copiable en la lista de grabaciones (hallazgo de la beta.1/2: el motivo no se podía leer)
 - [x] T003-16 Tiempo de espera de 10 min para las llamadas al proveedor (a 60 s la transcripción expiraba y se reintentaba sin fin) y motivo visible durante los reintentos (hallazgo de la beta.3)
 - [x] T003-17 Cuota agotada (429 con espera de horas): no se reintenta cada pocos minutos; se programa un reintento automático para cuando se renueve y se muestra el estado (hallazgo de la beta.5: 20 peticiones/día en la capa gratuita)
+- [x] T003-18 Clasificar y redactar en una sola petición (2 por grabación en vez de 3) y espaciar las llamadas 13 s por el límite de 5/min de la capa gratuita (hallazgo de la beta.6: 20 peticiones/día por modelo)

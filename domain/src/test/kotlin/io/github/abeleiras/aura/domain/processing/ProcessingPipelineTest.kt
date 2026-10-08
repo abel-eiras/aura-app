@@ -55,8 +55,7 @@ class ProcessingPipelineTest {
     @Test
     fun `happy path persists transcript then note and ends READY`() = runTest {
         val store = MemoryStore()
-        var calls = 0
-        val provider = ScriptedProvider({ talk }, { if (++calls == 1) "reunion" else "## Asistentes\nAna" })
+        val provider = ScriptedProvider({ talk }, { """{"type":"reunion","note":"## Asistentes\\nAna"}""" })
         val outcome = pipeline(provider, store).run(input)
 
         assertEquals(ProcessingOutcome.Finished(JobStatus.READY), outcome)
@@ -71,7 +70,7 @@ class ProcessingPipelineTest {
     fun `a failed draft keeps the transcript and the retry skips transcription`() = runTest {
         val store = MemoryStore()
         var fail = true
-        val provider = ScriptedProvider({ talk }, { if (fail) throw ProviderException(ErrorReason.RATE_LIMITED, true) else "reunion" })
+        val provider = ScriptedProvider({ talk }, { if (fail) throw ProviderException(ErrorReason.RATE_LIMITED, true) else """{"type":"reunion","note":"## A"}""" })
         val first = pipeline(provider, store).run(input)
 
         assertEquals(ProcessingOutcome.RetryLater(15.seconds), first)
@@ -81,7 +80,7 @@ class ProcessingPipelineTest {
         assertEquals(1, store.jobs[input.id]!!.attempts)
 
         fail = false
-        provider.complete = { "reunion\n## Asistentes" }
+        provider.complete = { """{"type":"reunion","note":"## Asistentes"}""" }
         val second = pipeline(provider, store).run(input)
         assertEquals(ProcessingOutcome.Finished(JobStatus.READY), second)
         assertEquals(1, provider.transcribeCalls, "transcription is not repeated")

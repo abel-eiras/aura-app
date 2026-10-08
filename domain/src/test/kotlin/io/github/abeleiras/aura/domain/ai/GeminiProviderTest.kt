@@ -66,7 +66,7 @@ class GeminiProviderTest {
 
     private fun provider() = GeminiProvider(
         OkHttpClient(), "AIzaTESTKEY", baseUrl = server.url("/"), pipelineVersion = "aura-app test",
-        now = { Instant.parse("2026-10-07T10:00:00Z") }, pollInterval = 1.milliseconds,
+        now = { Instant.parse("2026-10-07T10:00:00Z") }, pollInterval = 1.milliseconds, minCallInterval = kotlin.time.Duration.ZERO,
     )
 
     private val hints = LanguageHints("es", "gl")
