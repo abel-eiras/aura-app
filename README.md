@@ -7,11 +7,10 @@ IA. Sin servidores, sin suscripciones, sin tiendas. Software libre (MIT).
 Es la evolución de [Aura](https://github.com/abel-eiras/Aura) y
 [aura-transcribe](https://github.com/abel-eiras/aura-transcribe) para que
 cualquiera pueda usarla sin saber de informática: instalas, pegas una clave
-(o inicias sesión en OpenRouter) y grabas.
+(gratuita) de Google AI Studio y grabas.
 
-> **Estado: en construcción (hito 0).** Hay especificaciones, la lógica de
-> dominio con tests y el pipeline de releases; todavía no hay versiones
-> descargables ni grabadora. Este repositorio se desarrolla con
+> **Estado: versión 0.3.0.** Graba, transcribe separando hablantes, redacta la nota y
+> la copia sola a una carpeta (también de Google Drive). Se desarrolla con
 > *Spec-Driven Development*: primero se acuerda qué hace la app, luego se
 > construye. Ver la [hoja de ruta](ROADMAP.md).
 
@@ -20,12 +19,13 @@ cualquiera pueda usarla sin saber de informática: instalas, pegas una clave
 1. **Grabar** con un toque, también con el móvil bloqueado, desde la app, el
    mosaico de Ajustes rápidos o un widget. Siempre se ve que está grabando.
 2. **Transcribir con hablantes** ("Hablante 1", "Hablante 2"… a los que luego
-   pones nombre) usando Google Gemini (gratis con su capa gratuita) u
-   OpenRouter (pago por uso, eliges el modelo).
+   pones nombre) usando Google Gemini con una clave gratuita de
+   AI Studio (sin tarjeta; la capa gratuita tiene límites diarios).
 3. **Redactar la nota** según su tipo (acta de reunión, minuta de visita,
    nota personal… o los tuyos).
-4. **Compartirla** por WhatsApp, correo, Obsidian… o exportarla sola a una
-   carpeta (compatible con aura-transcribe).
+4. **Compartirla** por WhatsApp, correo… o exportarla sola, en segundo plano, a una
+   carpeta que eliges (incluida una de Google Drive, desde donde la leen tus
+   chatbots con su conector de Drive; compatible con aura-transcribe).
 5. **Actualizarse** desde la propia app, sin tienda.
 
 Tus grabaciones se quedan en tu móvil. Solo salen hacia el proveedor de IA

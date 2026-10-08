@@ -21,7 +21,7 @@
 - [x] T002-09 Aviso discreto en la pantalla principal si se saltó la configuración (HU-002-1, escenario 4)
 - [x] T002-10 Modelos de transcripción y redacción editables en Ajustes → Procesado → Avanzado (FR-002-07)
 - [ ] T002-11 Idioma de la interfaz elegible en Ajustes (FR-002-10)
-- [ ] T002-12 OpenRouter con OAuth PKCE (HU-002-3, FR-002-04) — hito 3, tras el spike
+- [-] T002-12 OpenRouter con OAuth PKCE — **descartado** (2026-10-08): es de pago por uso
 - [ ] T002-13 **Autor:** prueba manual con una clave real: `scripts/probe-gemini.sh list-models`, y el asistente en el móvil
 - [ ] T002-14 Marcar la spec como "Implementada" (cuando estén T002-09…13)
 - [x] T002-15 Modelo elegido de lo que la clave realmente tiene (alias `gemini-flash-latest` o el flash estable más nuevo) y cambio automático si el modelo se retira (hallazgo de la beta.4: `gemini-2.5-flash` ya no estaba disponible)

@@ -60,7 +60,6 @@ fun ProviderSetup(controller: ProviderController, modifier: Modifier = Modifier)
         Text(stringResource(R.string.provider_mode_question), style = MaterialTheme.typography.titleMedium)
         Column(modifier = Modifier.selectableGroup()) {
             ModeRow(ProcessingMode.GEMINI, state.mode, R.string.provider_mode_gemini, R.string.provider_mode_gemini_desc, true, controller)
-            ModeRow(ProcessingMode.OPENROUTER, state.mode, R.string.provider_mode_openrouter, R.string.provider_mode_openrouter_desc, false, controller)
             ModeRow(ProcessingMode.NONE, state.mode, R.string.provider_mode_none, R.string.provider_mode_none_desc, true, controller)
         }
         if (state.mode == ProcessingMode.GEMINI) {

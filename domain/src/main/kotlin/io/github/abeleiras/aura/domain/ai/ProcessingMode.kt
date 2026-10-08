@@ -4,7 +4,6 @@ package io.github.abeleiras.aura.domain.ai
 enum class ProcessingMode {
     NONE,
     GEMINI,
-    OPENROUTER,
     ;
 
     companion object {

@@ -122,8 +122,6 @@
     <string name="provider_mode_question">How do you want your recordings processed?</string>
     <string name="provider_mode_gemini">Google Gemini (recommended)</string>
     <string name="provider_mode_gemini_desc">Free within Google\'s free tier. You need a key from Google AI Studio; no card required.</string>
-    <string name="provider_mode_openrouter">OpenRouter</string>
-    <string name="provider_mode_openrouter_desc">Pay per use and pick the model. Coming soon.</string>
     <string name="provider_mode_none">Record only</string>
     <string name="provider_mode_none_desc">No AI. Aura only records; you keep or export the audio.</string>
     <string name="gemini_step_1">Open Google AI Studio and sign in with your Google account.</string>
@@ -139,7 +137,7 @@
     <string name="gemini_save_failed">This phone refused to store the key securely. Try again or restart the phone.</string>
     <string name="gemini_result_valid">Key is correct</string>
     <string name="gemini_result_invalid">That key isn\'t valid. Copy it again from AI Studio.</string>
-    <string name="gemini_result_region">Google doesn\'t offer Gemini in your country with this key. You can try OpenRouter later.</string>
+    <string name="gemini_result_region">Google doesn\'t offer Gemini in your country with this key.</string>
     <string name="gemini_result_rate_limited">The key works, but its quota is used up for now. Try again later.</string>
     <string name="gemini_result_network">No connection. The key is saved; check it when you are online.</string>
     <string name="gemini_result_unavailable">Google\'s service answered with an error (%1$d). Try again later.</string>
@@ -161,7 +159,6 @@
     <string name="language_none">None</string>
     <string name="settings_processing_section">Processing</string>
     <string name="settings_processing_gemini">Google Gemini</string>
-    <string name="settings_processing_openrouter">OpenRouter</string>
     <string name="settings_processing_none">Record only</string>
     <string name="settings_processing_configure">Set up processing</string>
     <string name="processing_channel_name">Processing</string>

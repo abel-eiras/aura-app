@@ -1,12 +1,12 @@
 # Plan de implementación: Procesado con IA
 
-**Spec:** `specs/003-procesado-ia/spec.md` · **Fecha:** 2026-10-06 · **Estado del plan:** Gemini completo (dominio + worker); OpenRouter pendiente de su spike.
+**Spec:** `specs/003-procesado-ia/spec.md` · **Fecha:** 2026-10-06 · **Estado del plan:** Gemini completo (dominio + worker). OpenRouter descartado.
 
 ## Resumen
 
 Dos pasos persistidos por separado. El dominio ya define la interfaz
 `AiProvider`, la política de reintentos, la normalización de hablantes y el
-paso 2 completo (`NoteDrafter`). Hecho en el hito 2: `GeminiProvider`, `ProcessingPipeline` y el worker. Falta OpenRouter.
+paso 2 completo (`NoteDrafter`). Hecho en el hito 2: `GeminiProvider`, `ProcessingPipeline` y el worker.
 
 ## Contexto técnico
 
@@ -48,10 +48,9 @@ La capa gratuita de Gemini permite, para el modelo probado, unas **5 peticiones 
 - **Modelo por defecto = Flash-Lite** (`ModelPicker.bestForFreeTier`): en la página de límites de una clave real, Gemini 3.8 Flash tenía 20 peticiones/día y 5/min, mientras que 3.1 y 3.5 Flash Lite tenían 500/día y 15/min (y Gemma 4, 14.400/día pero solo 16K tokens/min, además de ser un modelo de solo texto y por tanto inútil para transcribir). La calidad de Lite en diarización y gallego **no está medida**; si no basta, Ajustes → Procesado → Avanzado permite elegir otro modelo.
 - Los límites los pone Google y pueden cambiar; la app no los conoce de antemano, solo reacciona al 429 (cuota agotada → reintento automático cuando se renueva).
 
-## Spikes pendientes (bloquean el plan de los clientes)
+## Spikes
 
-1. **Gemini**: subida con Files API + salida JSON estructurada con hablantes; calidad en es/gl; tamaño máximo; qué errores devuelve por cuota (para clasificar transitorio/permanente).
-2. **OpenRouter**: modelos que aceptan audio, límite de tamaño; callback del OAuth PKCE (spec 002).
+Hechos con una clave real: Gemini acepta el audio Opus-en-OGG de Aura y separa hablantes. El de OpenRouter se descartó con el proveedor.
 
 ## Trazabilidad
 

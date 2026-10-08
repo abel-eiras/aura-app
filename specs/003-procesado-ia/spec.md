@@ -177,9 +177,5 @@ corregir los nombres de los hablantes, sin volver a transcribir.
 
 > Hallazgos preliminares (sin verificar) en `docs/spikes/proveedores-ia.md`.
 
-- Límites reales de tamaño de audio por petición en OpenRouter: si son
-  menores que los de una hora de audio, el plan debe definir troceado con
-  reconciliación de hablantes entre trozos, o limitar OpenRouter a la
-  redacción y exigir Gemini para transcribir. Se resuelve con un spike.
 - Calidad de la diarización del proveedor en gallego: validar con
   grabaciones reales antes de dar la feature por implementada.

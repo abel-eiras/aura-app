@@ -5,8 +5,7 @@
 ## Resumen
 
 Primer tramo (hito 2): asistente de primer arranque, modo "Solo grabar" y Gemini con clave
-(HU-002-1, 002-2, 002-4). OpenRouter (HU-002-3) queda para el hito 3, tras el spike del *callback*
-PKCE. La lógica pura (detección de clave, clasificación de la comprobación, cifrado, política de
+(HU-002-1, 002-2, 002-4). OpenRouter se descartó (de pago por uso). La lógica pura (detección de clave, clasificación de la comprobación, cifrado, política de
 envío) vive en `:domain` con tests; Android aporta Keystore, preferencias y la UI.
 
 ## Contexto técnico
@@ -47,7 +46,7 @@ envío) vive en `:domain` con tests; Android aporta Keystore, preferencias y la 
 | Requisito | Componente | Test |
 |---|---|---|
 | FR-002-01 | `OnboardingScreen` | Manual |
-| FR-002-02 | `ProcessingMode` (OpenRouter deshabilitado hasta el hito 3) | `ProcessingModeTest` |
+| FR-002-02 | `ProcessingMode` (Gemini y Solo grabar) | `ProcessingModeTest` |
 | FR-002-03 | `ApiKeys`, `GeminiClient`, `ProviderSetup` | `ApiKeysTest`, `GeminiClientTest` |
 | FR-002-05 | `SecretBox`, `CredentialStore`, reglas de copia | `SecretBoxTest`, `BackupRulesTest` |
 | FR-002-06 | `OnboardingScreen` (idiomas) | Manual |

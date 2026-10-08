@@ -108,7 +108,6 @@ fun SettingsScreen(
                 text = stringResource(
                     when (providerState.mode) {
                         ProcessingMode.GEMINI -> R.string.settings_processing_gemini
-                        ProcessingMode.OPENROUTER -> R.string.settings_processing_openrouter
                         ProcessingMode.NONE -> R.string.settings_processing_none
                     },
                 ),
