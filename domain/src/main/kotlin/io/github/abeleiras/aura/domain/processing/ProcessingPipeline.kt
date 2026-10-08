@@ -27,6 +27,8 @@ data class JobRecord(
     val error: ErrorReason? = null,
     val message: String? = null,
     val updatedAt: String,
+    /** Set when the provider said how long to wait (e.g. the free quota resets in 5 h). */
+    val retryAfterSeconds: Long? = null,
 ) {
     fun toJson(): String = JSON.encodeToString(serializer(), this)
 
@@ -79,8 +81,8 @@ class ProcessingPipeline(
      */
     suspend fun run(input: ProcessingInput, forcedType: NoteType? = null): ProcessingOutcome {
         var job = store.loadJob(input.id) ?: JobRecord(JobStatus.QUEUED, updatedAt = now().toString())
-        fun update(status: JobStatus, attempts: Int = job.attempts, error: ErrorReason? = null, message: String? = null) {
-            job = JobRecord(status, attempts, error, message, now().toString())
+        fun update(status: JobStatus, attempts: Int = job.attempts, error: ErrorReason? = null, message: String? = null, retryAfterSeconds: Long? = null) {
+            job = JobRecord(status, attempts, error, message, now().toString(), retryAfterSeconds)
             store.saveJob(input.id, job)
         }
         suspend fun steps(): ProcessingOutcome {
@@ -132,25 +134,25 @@ class ProcessingPipeline(
         }
     }
 
-    private fun finish(job: JobRecord, update: (JobStatus, Int, ErrorReason?, String?) -> Unit): ProcessingOutcome {
-        if (job.status != JobStatus.READY && job.status != JobStatus.NO_CONTENT) update(JobStatus.READY, 0, null, null)
+    private fun finish(job: JobRecord, update: (JobStatus, Int, ErrorReason?, String?, Long?) -> Unit): ProcessingOutcome {
+        if (job.status != JobStatus.READY && job.status != JobStatus.NO_CONTENT) update(JobStatus.READY, 0, null, null, null)
         return ProcessingOutcome.Finished(if (job.status == JobStatus.NO_CONTENT) JobStatus.NO_CONTENT else JobStatus.READY)
     }
 
     private fun failed(
         error: ProviderException,
         job: JobRecord,
-        update: (JobStatus, Int, ErrorReason?, String?) -> Unit,
+        update: (JobStatus, Int, ErrorReason?, String?, Long?) -> Unit,
     ): ProcessingOutcome {
         val attempts = job.attempts + 1
         return when (val decision = ProcessingPolicy.onFailure(error, attempts)) {
             is FailureDecision.Retry -> {
                 val status = if (error.reason == ErrorReason.NETWORK) JobStatus.WAITING_NETWORK else JobStatus.QUEUED
-                update(status, attempts, error.reason, error.message)
-                ProcessingOutcome.RetryLater(decision.after)
+                update(status, attempts, error.reason, error.message, error.retryAfter?.inWholeSeconds)
+                ProcessingOutcome.RetryLater(maxOf(decision.after, error.retryAfter ?: decision.after))
             }
             is FailureDecision.GiveUp -> {
-                update(JobStatus.ERROR, attempts, decision.reason, error.message)
+                update(JobStatus.ERROR, attempts, decision.reason, error.message, error.retryAfter?.inWholeSeconds)
                 ProcessingOutcome.Finished(JobStatus.ERROR, decision.reason)
             }
         }

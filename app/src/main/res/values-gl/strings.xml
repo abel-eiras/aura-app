@@ -177,7 +177,7 @@
     <string name="processing_error_rate_limited">O provedor está limitando as peticións. Téntao en uns minutos.</string>
     <string name="processing_error_unavailable">O provedor non está dispoñible agora. Téntao máis tarde.</string>
     <string name="processing_error_credential">Rexeitaron a chave. Revísaa en Axustes → Procesado.</string>
-    <string name="processing_error_quota">A cota gratuíta de hoxe está esgotada. Téntao mañá.</string>
+    <string name="processing_error_quota">A cota gratuíta deste modelo está esgotada (as chaves gratuítas permiten poucas peticións ao día). Téntao máis tarde.</string>
     <string name="processing_error_funds">Non queda saldo no provedor.</string>
     <string name="processing_error_too_long">Demasiado longa para procesar (máis de 3 horas). Podes exportar o audio.</string>
     <string name="processing_error_invalid_response">Non se puido ler a resposta do provedor. Téntao de novo.</string>
@@ -229,4 +229,5 @@
     <string name="processing_retrying_network">Sen resposta a tempo; reintentando…</string>
     <string name="processing_error_model">O modelo xa non está dispoñible. Escolle outro en Axustes → Procesado → Avanzado.</string>
     <string name="provider_models_available">Dispoñibles para a túa chave: %1$s</string>
+    <string name="processing_waiting_quota">Cota gratuíta esgotada; Aura tentarao soa cando se renove.</string>
 </resources>

@@ -152,6 +152,24 @@ class GeminiProviderTest {
         check(418, "", ErrorReason.UNKNOWN, false)
     }
 
+    // Found with a real key: free tier 20 requests/day, "Please retry in 5h30m37s", reported as a plain 429
+    @Test
+    fun `a 429 that asks for hours of waiting is an exhausted quota, not a retry`() {
+        val body = """{"error":{"code":429,"message":"You exceeded your current quota. * Quota exceeded for metric: generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\nPlease retry in 5h30m37.318740942s."}}"""
+        val e = GeminiProvider.errorFor(429, body, "/v1beta/models/x:generateContent")
+        assertEquals(ErrorReason.QUOTA_EXHAUSTED, e.reason)
+        assertFalse(e.transient)
+        assertEquals(5 * 3600L + 30 * 60 + 37, e.retryAfter!!.inWholeSeconds)
+    }
+
+    @Test
+    fun `a 429 asking for seconds is a transient rate limit that remembers the wait`() {
+        val e = GeminiProvider.errorFor(429, """{"error":{"message":"Resource exhausted","details":[{"retryDelay":"19s"}]}}""")
+        assertEquals(ErrorReason.RATE_LIMITED, e.reason)
+        assertTrue(e.transient)
+        assertEquals(19L, e.retryAfter!!.inWholeSeconds)
+    }
+
     @Test
     fun `a dropped connection is a transient network error`() = runTest {
         server.shutdown()

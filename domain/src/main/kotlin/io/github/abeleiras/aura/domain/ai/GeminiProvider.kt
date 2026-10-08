@@ -41,6 +41,7 @@ import java.io.File
 import java.io.IOException
 import java.time.Instant
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -282,6 +283,21 @@ class GeminiProvider(
                 "Answer with JSON only."
         }
 
+        private val LONG_WAIT = 10.minutes
+        private val retryInText = Regex("retry in (?:(\\d+)h)?(?:(\\d+)m)?(?:([\\d.]+)s)?", RegexOption.IGNORE_CASE)
+        private val retryDelayJson = Regex("\"retryDelay\"\\s*:\\s*\"([\\d.]+)s\"")
+
+        /** "Please retry in 5h30m37.3s" or `"retryDelay": "19s"` from Google's error, as a duration. */
+        fun parseRetryDelay(text: String): Duration? {
+            retryInText.find(text)?.let { m ->
+                val (h, min, sec) = m.destructured
+                if (h.isNotEmpty() || min.isNotEmpty() || sec.isNotEmpty()) {
+                    return ((h.toLongOrNull() ?: 0L) * 3600 + (min.toLongOrNull() ?: 0L) * 60 + (sec.toDoubleOrNull() ?: 0.0)).seconds
+                }
+            }
+            return retryDelayJson.find(text)?.groupValues?.get(1)?.toDoubleOrNull()?.seconds
+        }
+
         /** Maps an HTTP error to what the user should be told and whether retrying can help (FR-003-07). */
         fun errorFor(code: Int, body: String, where: String = ""): ProviderException {
             val message = try {
@@ -290,6 +306,7 @@ class GeminiProvider(
                 ""
             }
             val lower = message.lowercase()
+            val retry = parseRetryDelay(message + " " + body)
             // What the user can copy from the error details to report it: never contains the key (it travels in a header).
             val detail = "HTTP $code" + (if (where.isNotBlank()) " on $where" else "") + (if (message.isNotBlank()) ": $message" else "")
             return when {
@@ -297,9 +314,10 @@ class GeminiProvider(
                     ProviderException(ErrorReason.PROVIDER_UNAVAILABLE, false, "Gemini is not available in this country ($detail)")
                 code == 404 || "no longer available" in lower || "is not found" in lower || "is not supported for" in lower ->
                     ProviderException(ErrorReason.MODEL_UNAVAILABLE, false, detail)
-                code == 429 && ("per day" in lower || "daily" in lower || "perday" in lower) ->
-                    ProviderException(ErrorReason.QUOTA_EXHAUSTED, false, detail)
-                code == 429 -> ProviderException(ErrorReason.RATE_LIMITED, true, detail)
+                // A long wait means the daily quota is gone; retrying every few minutes only burns requests.
+                code == 429 && ("per day" in lower || "daily" in lower || "perday" in lower || (retry != null && retry >= LONG_WAIT)) ->
+                    ProviderException(ErrorReason.QUOTA_EXHAUSTED, false, detail, retryAfter = retry)
+                code == 429 -> ProviderException(ErrorReason.RATE_LIMITED, true, detail, retryAfter = retry)
                 code == 401 || code == 403 || (code == 400 && "api key" in lower) ->
                     ProviderException(ErrorReason.INVALID_CREDENTIAL, false, detail)
                 code == 400 && ("too long" in lower || "exceeds" in lower || "duration" in lower) ->

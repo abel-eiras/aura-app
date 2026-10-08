@@ -122,6 +122,16 @@ class ProcessingRepository(
         schedule(fileName, typeId, ExistingWorkPolicy.REPLACE)
     }
 
+    /** Separate unique work so it can be scheduled from inside the running worker without cancelling it. */
+    private fun scheduleLater(fileName: String, typeId: String?, delaySeconds: Long) {
+        val request = OneTimeWorkRequestBuilder<ProcessingWorker>()
+            .setInputData(workDataOf(ProcessingWorker.KEY_FILE to fileName, ProcessingWorker.KEY_TYPE to typeId))
+            .setInitialDelay(delaySeconds, TimeUnit.SECONDS)
+            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+            .build()
+        WorkManager.getInstance(context).enqueueUniqueWork("process-${idOf(fileName)}-later", ExistingWorkPolicy.REPLACE, request)
+    }
+
     private fun schedule(fileName: String, typeId: String?, policy: ExistingWorkPolicy) {
         val request = OneTimeWorkRequestBuilder<ProcessingWorker>()
             .setInputData(workDataOf(ProcessingWorker.KEY_FILE to fileName, ProcessingWorker.KEY_TYPE to typeId))
@@ -169,6 +179,18 @@ class ProcessingRepository(
             Log.e("Processing", "Unexpected failure for $fileName", e)
             store.saveJob(id, JobRecord(JobStatus.ERROR, error = ErrorReason.UNKNOWN, message = "${e.javaClass.simpleName}: ${e.message}", updatedAt = Instant.now().toString()))
             ProcessingOutcome.Finished(JobStatus.ERROR, ErrorReason.UNKNOWN)
+        }
+        if (outcome is ProcessingOutcome.Finished && outcome.error == ErrorReason.QUOTA_EXHAUSTED) {
+            // The free quota resets on its own: wait for it and try again by itself (HU-003-3, "Reintentar mañana").
+            val wait = store.loadJob(id)?.retryAfterSeconds
+            if (wait != null && wait in 1..MAX_QUOTA_WAIT_SECONDS) {
+                store.saveJob(
+                    id,
+                    JobRecord(JobStatus.QUEUED, 0, ErrorReason.QUOTA_EXHAUSTED, store.loadJob(id)?.message, Instant.now().toString(), wait),
+                )
+                scheduleLater(fileName, forcedTypeId, wait + 60)
+                return@withLock outcome
+            }
         }
         if (outcome is ProcessingOutcome.Finished && outcome.error == ErrorReason.MODEL_UNAVAILABLE && provider.refreshModelsAfterUnavailable()) {
             // The model was retired: a different one was picked from what the key has, so run again with it.
@@ -248,6 +270,7 @@ class ProcessingRepository(
 
     companion object {
         private const val CHANNEL = "processing"
+        private const val MAX_QUOTA_WAIT_SECONDS = 26 * 3600L
         private val runLock = Mutex() // one recording at a time, in order of arrival (FR-003-06)
 
         fun idOf(fileName: String): String = fileName.substringBeforeLast('.')
