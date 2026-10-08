@@ -43,7 +43,7 @@ class NoteDrafterTest {
 
     @Test
     fun `spec 003 unknown classification falls back to the default type and is flagged`() = runTest {
-        val note = NoteDrafter(FakeProvider(ArrayDeque(listOf("???", "texto"))), types, null).run(transcript)
+        val note = NoteDrafter(FakeProvider(ArrayDeque(listOf("""{"type":"???","note":"texto"}"""))), types, null).run(transcript)
         assertEquals("nota_personal", note.type.id)
         assertTrue(note.classifiedByFallback)
     }
@@ -51,7 +51,7 @@ class NoteDrafterTest {
     @Test
     fun `an empty draft is a retryable invalid response`() = runTest {
         val e = assertFailsWith<ProviderException> {
-            NoteDrafter(FakeProvider(ArrayDeque(listOf("reunion", "   "))), types, null).run(transcript)
+            NoteDrafter(FakeProvider(ArrayDeque(listOf("""{"type":"reunion","note":"   "}"""))), types, null).run(transcript)
         }
         assertEquals(ErrorReason.INVALID_RESPONSE, e.reason)
         assertTrue(e.transient)
@@ -61,5 +61,36 @@ class NoteDrafterTest {
     fun `FR-003-09 never drafts an empty transcript`() = runTest {
         val empty = transcript.copy(fullText = "")
         assertFailsWith<IllegalArgumentException> { NoteDrafter(FakeProvider(ArrayDeque()), types, null).run(empty) }
+    }
+
+    // Free tiers allow ~20 requests/day: classify + draft in ONE request when no type names its own model
+    @Test
+    fun `FR-003-05 a single request classifies and drafts when types share the model`() = runTest {
+        val provider = FakeProvider(ArrayDeque(listOf("""{"type":"reunion","note":"## Asistentes\nAna"}""")))
+        val note = NoteDrafter(provider, types, defaultModel = null).run(transcript)
+
+        assertEquals(1, provider.calls.size)
+        assertEquals("reunion", note.type.id)
+        assertEquals("## Asistentes\nAna", note.body)
+        assertEquals(false, note.classifiedByFallback)
+        val system = provider.calls.single().system
+        types.forEach { assertTrue(it.criterion in system && it.draftingPrompt in system, it.id) }
+    }
+
+    @Test
+    fun `combined answer tolerates code fences and falls back on an unknown type`() = runTest {
+        val provider = FakeProvider(ArrayDeque(listOf("```json\n{\"type\":\"inventado\",\"note\":\"texto\"}\n```")))
+        val note = NoteDrafter(provider, types, null).run(transcript)
+        assertEquals(types.first { it.isDefault }.id, note.type.id)
+        assertTrue(note.classifiedByFallback)
+    }
+
+    @Test
+    fun `combined answer that is not json is a transient invalid response`() = runTest {
+        val e = assertFailsWith<ProviderException> {
+            NoteDrafter(FakeProvider(ArrayDeque(listOf("lo siento"))), types, null).run(transcript)
+        }
+        assertEquals(ErrorReason.INVALID_RESPONSE, e.reason)
+        assertTrue(e.transient)
     }
 }

@@ -13,6 +13,8 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -59,6 +61,8 @@ class GeminiProvider(
     private val now: () -> Instant = { Instant.now() },
     private val pollInterval: Duration = 2.seconds,
     private val maxPolls: Int = 60,
+    /** Free keys allow about 5 requests a minute; spacing the calls avoids 429s that would only be retried. */
+    private val minCallInterval: Duration = 13.seconds,
 ) : AiProvider {
 
     override suspend fun transcribe(audio: File, hints: LanguageHints): Transcript {
@@ -165,6 +169,7 @@ class GeminiProvider(
     // ---- generateContent ----
 
     private suspend fun generate(model: String, parts: JsonArray, system: String?, temperature: Double, schema: JsonObject?): JsonObject {
+        pace()
         val payload = buildJsonObject {
             putJsonArray("contents") { add(buildJsonObject { put("role", "user"); put("parts", parts) }) }
             if (system != null) {
@@ -184,6 +189,15 @@ class GeminiProvider(
             .post(payload.toString().toRequestBody(JSON_MEDIA))
             .build()
         return call(request) { parseObject(checkSuccess(it)) }
+    }
+
+    /** Waits until [minCallInterval] has passed since the previous generateContent call of this process. */
+    private suspend fun pace() {
+        paceLock.withLock {
+            val wait = lastCallNanos?.let { minCallInterval.inWholeNanoseconds - (System.nanoTime() - it) } ?: 0L
+            if (wait > 0) delay(wait / 1_000_000)
+            lastCallNanos = System.nanoTime()
+        }
     }
 
     private fun candidateText(body: JsonObject): String {
@@ -262,6 +276,8 @@ class GeminiProvider(
     }
 
     companion object {
+        private val paceLock = Mutex()
+        private var lastCallNanos: Long? = null
         private val JSON_MEDIA = "application/json".toMediaType()
 
         fun mimeTypeOf(file: File): String = when (file.extension.lowercase()) {
