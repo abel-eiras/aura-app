@@ -40,12 +40,17 @@ funciones.
 - [x] **003** Procesado completo con Gemini. *Funciona con una clave real; falta medir calidad en gallego y con grabaciones largas (T003-14).*
 - [~] **004** Hecho: vista de nota, renombrar/unir hablantes, compartir y exportación automática de transcripción y nota a una carpeta (también de Google Drive, probado en un Pixel 10 Pro). Falta: búsqueda y filtros, reproducir desde un segmento.
 
+## Hito 2b — Marca y estilo (v0.4.0)
+
+- [x] Estilo "Cuaderno" (brutalista, como la web de Formula Farma): paleta tinta, morado y lima; Familjen Grotesk e IBM Plex Mono incluidas en la app; esquinas rectas, bordes y sombras duras.
+- [x] Marca "Aura by Formula Farma": logotipo propio como icono de la app (adaptable y tematizado), del widget y de la pantalla principal.
+- [x] Sin enlaces a los repositorios anteriores (son privados).
+
 ## Hito 3 — Para amigos (v1.0.0)
 
 - [ ] **004** "Abrir en…" (HU-004-4).
 - [ ] **006** Página de instalación con QR y guía con capturas (FR-006-09).
 - [ ] Prueba con 5 personas no técnicas contra CE-002-1 y CE-006-1…2.
-- [ ] Repositorio Aura original: aviso apuntando a aura-app.
 
 ## Después de la 1.0 (sin spec todavía)
 

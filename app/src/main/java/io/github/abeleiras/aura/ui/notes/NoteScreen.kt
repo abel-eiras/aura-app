@@ -34,7 +34,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -50,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.abeleiras.aura.R
+import io.github.abeleiras.aura.ui.components.AuraTextButton
 import io.github.abeleiras.aura.domain.notes.NoteRenderer
 import io.github.abeleiras.aura.domain.notes.NoteType
 import io.github.abeleiras.aura.domain.processing.JobRecord
@@ -167,12 +167,12 @@ fun NoteScreen(viewModel: NoteViewModel, onBackClick: () -> Unit) {
             title = { Text(stringResource(R.string.note_transcribe_again)) },
             text = { Text(stringResource(R.string.note_transcribe_again_warning)) },
             confirmButton = {
-                TextButton(onClick = {
+                AuraTextButton(onClick = {
                     dialog = NoteDialog.None
                     viewModel.transcribeAgain()
                 }) { Text(stringResource(R.string.note_transcribe_again_confirm)) }
             },
-            dismissButton = { TextButton(onClick = { dialog = NoteDialog.None }) { Text(stringResource(R.string.provider_cancel)) } },
+            dismissButton = { AuraTextButton(onClick = { dialog = NoteDialog.None }) { Text(stringResource(R.string.provider_cancel)) } },
         )
     }
 }
@@ -255,13 +255,13 @@ private fun SpeakerDialog(
                     Text(stringResource(R.string.note_merge_title), style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(top = 16.dp))
                     Text(stringResource(R.string.note_merge_hint), style = MaterialTheme.typography.bodySmall)
                     others.forEach { (label, display) ->
-                        TextButton(onClick = { onMerge(label) }) { Text(stringResource(R.string.note_merge_into, display)) }
+                        AuraTextButton(onClick = { onMerge(label) }) { Text(stringResource(R.string.note_merge_into, display)) }
                     }
                 }
             }
         },
-        confirmButton = { TextButton(onClick = { onSave(name) }) { Text(stringResource(R.string.note_rename_save)) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.provider_cancel)) } },
+        confirmButton = { AuraTextButton(onClick = { onSave(name) }) { Text(stringResource(R.string.note_rename_save)) } },
+        dismissButton = { AuraTextButton(onClick = onDismiss) { Text(stringResource(R.string.provider_cancel)) } },
     )
 }
 
@@ -284,7 +284,7 @@ private fun ChangeTypeDialog(types: List<NoteType>, current: String?, onPick: (S
             }
         },
         confirmButton = {},
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.provider_cancel)) } },
+        dismissButton = { AuraTextButton(onClick = onDismiss) { Text(stringResource(R.string.provider_cancel)) } },
     )
 }
 

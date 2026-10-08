@@ -4,7 +4,7 @@
 
 ## Contexto
 
-Aura (repositorio `abel-eiras/Aura`) es una app Android de ~3.100 líneas en
+Aura (proyecto anterior, repositorio privado) es una app Android de ~3.100 líneas en
 Kotlin/Compose con buena base de grabación (servicio en primer plano,
 mosaico, widget, pausa en llamadas). Su capa de datos está construida
 alrededor de Drive, que desaparece (ADR-0004).

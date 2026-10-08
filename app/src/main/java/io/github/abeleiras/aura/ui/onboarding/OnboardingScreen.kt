@@ -13,12 +13,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -32,6 +30,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import io.github.abeleiras.aura.R
+import io.github.abeleiras.aura.ui.components.AuraLogo
+import io.github.abeleiras.aura.ui.components.AuraTextButton
+import io.github.abeleiras.aura.ui.components.AuraButton
 import io.github.abeleiras.aura.data.ai.ProviderController
 import io.github.abeleiras.aura.data.prefs.AppSettings
 import io.github.abeleiras.aura.ui.provider.ProviderSetup
@@ -63,8 +64,8 @@ fun OnboardingScreen(settings: AppSettings, provider: ProviderController, onFini
             }
             Spacer(Modifier.height(16.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = ::finish) { Text(stringResource(R.string.onboarding_skip)) }
-                Button(onClick = { if (step < 2) step++ else finish() }) {
+                AuraTextButton(onClick = ::finish) { Text(stringResource(R.string.onboarding_skip)) }
+                AuraButton(onClick = { if (step < 2) step++ else finish() }) {
                     Text(
                         stringResource(
                             when (step) {
@@ -82,8 +83,10 @@ fun OnboardingScreen(settings: AppSettings, provider: ProviderController, onFini
 
 @Composable
 private fun Welcome() {
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.padding(top = 48.dp)) {
-        Text(stringResource(R.string.onboarding_welcome_title), style = MaterialTheme.typography.headlineMedium)
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.padding(top = 32.dp)) {
+        AuraLogo(size = 96.dp)
+        Text(stringResource(R.string.brand_by).uppercase(), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(stringResource(R.string.onboarding_welcome_title), style = MaterialTheme.typography.headlineLarge)
         Text(stringResource(R.string.onboarding_welcome_body), style = MaterialTheme.typography.bodyLarge)
     }
 }

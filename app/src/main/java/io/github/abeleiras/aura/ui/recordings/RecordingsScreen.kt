@@ -17,7 +17,6 @@ import androidx.compose.material.icons.outlined.Pause
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -26,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,6 +38,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.abeleiras.aura.R
+import io.github.abeleiras.aura.ui.components.AuraTextButton
+import io.github.abeleiras.aura.ui.components.AuraAttentionCard
 import io.github.abeleiras.aura.data.Recording
 import io.github.abeleiras.aura.domain.ai.ProviderReadiness
 import io.github.abeleiras.aura.domain.export.ExportStatus
@@ -118,12 +118,12 @@ fun RecordingsScreen(viewModel: RecordingsViewModel, onOpenNote: (String) -> Uni
                 )
             },
             confirmButton = {
-                TextButton(onClick = {
+                AuraTextButton(onClick = {
                     viewModel.delete(item.recording)
                     pendingDelete = null
                 }) { Text(stringResource(R.string.recordings_delete)) }
             },
-            dismissButton = { TextButton(onClick = { pendingDelete = null }) { Text(stringResource(R.string.recordings_cancel)) } },
+            dismissButton = { AuraTextButton(onClick = { pendingDelete = null }) { Text(stringResource(R.string.recordings_cancel)) } },
         )
     }
 }
@@ -163,7 +163,7 @@ private fun RecordingsList(
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 )
                 if (RecordingPolicy.isArchiveLarge(totalBytes)) {
-                    Card(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+                    AuraAttentionCard(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
                         Text(
                             text = stringResource(R.string.recordings_large_archive_warning, Formatter.formatShortFileSize(context, totalBytes)),
                             style = MaterialTheme.typography.bodyMedium,
@@ -185,7 +185,7 @@ private fun RecordingsList(
                 onShowDetails = { onShowDetails(item) },
                 onDelete = { onDelete(item) },
             )
-            HorizontalDivider()
+            HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.outline)
         }
     }
 }
@@ -237,16 +237,16 @@ private fun RecordingRow(
                 }
             }
             val status = item.job?.status
-            if (status == JobStatus.ERROR || item.job?.error != null) TextButton(onClick = onShowDetails) { Text(stringResource(R.string.processing_details)) }
+            if (status == JobStatus.ERROR || item.job?.error != null) AuraTextButton(onClick = onShowDetails) { Text(stringResource(R.string.processing_details)) }
             when {
-                status == JobStatus.READY -> TextButton(onClick = onOpenNote) { Text(stringResource(R.string.processing_action_open)) }
+                status == JobStatus.READY -> AuraTextButton(onClick = onOpenNote) { Text(stringResource(R.string.processing_action_open)) }
                 status == null || status == JobStatus.ERROR ->
-                    TextButton(onClick = onProcess) {
+                    AuraTextButton(onClick = onProcess) {
                         Text(stringResource(if (status == JobStatus.ERROR) R.string.processing_action_retry else R.string.processing_action_process))
                     }
             }
             if (item.exportStatus == ExportStatus.ERROR) {
-                TextButton(onClick = onRetryExport) { Text(stringResource(R.string.recordings_export_retry)) }
+                AuraTextButton(onClick = onRetryExport) { Text(stringResource(R.string.recordings_export_retry)) }
             }
             IconButton(onClick = { shareRecording(context, recording) }) {
                 Icon(Icons.Outlined.Share, contentDescription = stringResource(R.string.content_description_share_recording))
@@ -280,16 +280,16 @@ private fun ProcessingBanner(readiness: ProviderReadiness, pending: Int, onProce
         ProviderReadiness.NEEDS_PRIVACY -> R.string.banner_needs_privacy
         ProviderReadiness.READY -> if (pending > 0) R.string.banner_ready_pending else R.string.banner_ready
     }
-    Card(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+    AuraAttentionCard(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text(
                 if (readiness == ProviderReadiness.READY && pending > 0) stringResource(text, pending) else stringResource(text),
                 style = MaterialTheme.typography.bodyMedium,
             )
             if (readiness != ProviderReadiness.READY) {
-                TextButton(onClick = onSetup) { Text(stringResource(R.string.banner_setup)) }
+                AuraTextButton(onClick = onSetup) { Text(stringResource(R.string.banner_setup)) }
             } else if (pending > 0) {
-                TextButton(onClick = onProcessAll) { Text(stringResource(R.string.banner_process_all)) }
+                AuraTextButton(onClick = onProcessAll) { Text(stringResource(R.string.banner_process_all)) }
             }
         }
     }
@@ -357,11 +357,11 @@ private fun ErrorDetailsDialog(item: RecordingItem, onDismiss: () -> Unit) {
         title = { Text(stringResource(R.string.processing_details)) },
         text = { androidx.compose.foundation.text.selection.SelectionContainer { Text(text, style = MaterialTheme.typography.bodySmall) } },
         confirmButton = {
-            TextButton(onClick = {
+            AuraTextButton(onClick = {
                 context.getSystemService(android.content.ClipboardManager::class.java)
                     ?.setPrimaryClip(android.content.ClipData.newPlainText("Aura", text))
             }) { Text(stringResource(R.string.processing_details_copy)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.crash_close)) } },
+        dismissButton = { AuraTextButton(onClick = onDismiss) { Text(stringResource(R.string.crash_close)) } },
     )
 }

@@ -81,7 +81,7 @@ indicador, ni arranques automáticos sin acción del usuario.
 
 Los ficheros que exporta la app (JSON de transcripción y notas Markdown)
 siguen **el mismo formato** que produce
-[aura-transcribe](https://github.com/abel-eiras/aura-transcribe), y los tipos
+aura-transcribe, y los tipos
 de nota usan el mismo modelo de categorías. Quien quiera procesar en su PC
 puede usar la app solo como grabadora y exportar el audio a la carpeta que
 vigila aura-transcribe.
