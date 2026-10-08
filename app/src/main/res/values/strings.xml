@@ -223,7 +223,6 @@
     <string name="processing_error_model">The model is no longer available. Pick another one in Settings → Processing → Advanced.</string>
     <string name="provider_models_available">Available to your key: %1$s</string>
     <string name="processing_waiting_quota">Free quota used up; Aura will try again by itself when it renews.</string>
-    <string name="brand_by">by Formula Farma</string>
     <string name="main_tag_idle">● READY</string>
     <string name="main_tag_recording">● RECORDING</string>
     <string name="main_tag_paused">PAUSED</string>

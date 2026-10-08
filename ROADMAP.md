@@ -43,7 +43,7 @@ funciones.
 ## Hito 2b — Marca y estilo (v0.4.0)
 
 - [x] Estilo "Cuaderno" (brutalista, como la web de Formula Farma): paleta tinta, morado y lima; Familjen Grotesk e IBM Plex Mono incluidas en la app; esquinas rectas, bordes y sombras duras.
-- [x] Marca "Aura by Formula Farma": logotipo propio como icono de la app (adaptable y tematizado), del widget y de la pantalla principal.
+- [x] Logotipo propio como icono de la app (adaptable y tematizado), del widget y de la pantalla principal. La app se llama "Aura"; el README cuenta que forma parte de un proyecto de Formula Farma.
 - [x] Sin enlaces a los repositorios anteriores (son privados).
 
 ## Hito 3 — Para amigos (v1.0.0)

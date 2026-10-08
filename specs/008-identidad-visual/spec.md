@@ -1,4 +1,4 @@
-# Especificación: Identidad visual "Aura by Formula Farma"
+# Especificación: Identidad visual
 
 **ID:** 008 · **Estado:** Aprobada (2026-10-08) · **Creada:** 2026-10-08
 **Depende de:** 001, 002, 003, 004
@@ -7,8 +7,9 @@
 
 La interfaz inicial usaba el estilo por defecto de Material y un logotipo provisional. El autor eligió, entre
 cuatro propuestas ("Calma", "Medianoche", "Cuaderno", "Océano"), la **"Cuaderno"** (brutalista) porque se parece a
-la web de Formula Farma, y pidió usar su paleta y su logotipo, y que la app pase a llamarse
-**"Aura by Formula Farma"**. Esta feature no cambia ningún comportamiento: solo la apariencia y la marca.
+la web de Formula Farma, y pidió usar su paleta y su logotipo. "Aura by Formula Farma" fue solo una forma de explicar el concepto: la app se
+llama **Aura**, sin segundo nombre ni lema; la relación con Formula Farma se cuenta solo en el README. Esta feature
+no cambia ningún comportamiento: solo la apariencia.
 
 ## Historias de usuario
 
@@ -21,8 +22,7 @@ la pantalla principal y los ajustes), para reconocerla y fiarme de ella.
 
 1. **Dado** que instalo la app, **cuando** miro el icono en el lanzador, **entonces** veo el logotipo de la
    marca sobre fondo lima, y en Android 13+ se adapta al tema de iconos del sistema.
-2. **Dado** que abro la app por primera vez, **cuando** veo la bienvenida, **entonces** aparece el logotipo y
-   "Aura by Formula Farma".
+2. **Dado** que abro la app por primera vez, **cuando** veo la bienvenida, **entonces** aparece el logotipo.
 3. **Dado** que estoy en la pantalla principal, **cuando** grabo, **entonces** el estado ("GRABANDO", "EN PAUSA",
    "LISTO") y el cronómetro son visibles y el botón de grabar cambia de color y de icono.
 4. **Dado** que el sistema está en modo oscuro, **cuando** abro la app, **entonces** se ve con la variante
@@ -40,8 +40,9 @@ la pantalla principal y los ajustes), para reconocerla y fiarme de ella.
   (Constitución V); el contraste de texto DEBE ser de al menos 4,5:1 (3:1 en texto grande).
 - **FR-008-05**: El logotipo DEBE usarse como icono adaptable (con capa monocromo), icono de notificación y del
   mosaico, widget y marca de la pantalla principal y de la bienvenida.
-- **FR-008-06**: El nombre visible de la marca es "Aura by Formula Farma" (README, bienvenida, ajustes y
-  pantalla principal); el identificador de la app no cambia (actualizaciones desde versiones anteriores).
+- **FR-008-06**: El nombre visible de la app es "Aura", sin segundo nombre ni lema. El identificador de la app
+  no cambia (actualizaciones desde versiones anteriores). El README cuenta que forma parte de un proyecto
+  personal de Formula Farma (https://formulafarma.com/).
 - **FR-008-07**: El repositorio NO DEBE contener enlaces a los proyectos anteriores (son privados).
 
 ## Fuera de alcance

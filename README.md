@@ -1,6 +1,6 @@
 <p align="center"><img src="docs/assets/logo.png" alt="Logo de Aura" width="120"></p>
 
-# Aura by Formula Farma
+# Aura
 
 Grabadora de reuniones y notas de voz para Android que **transcribe
 separando quién habla y redacta la nota por ti**, usando tu propia cuenta de
@@ -9,9 +9,10 @@ IA. Sin servidores, sin suscripciones, sin tiendas. Software libre (MIT).
 Es la evolución de dos herramientas personales (una grabadora y un transcriptor
 para PC) pensada para que cualquiera pueda usarla sin saber de informática:
 instalas, pegas una clave (gratuita) de Google AI Studio y grabas. Es un
-proyecto de Formula Farma.
+proyecto personal que forma parte de [Formula Farma](https://formulafarma.com/), bajo el mismo paraguas (y el
+mismo pretexto) que el resto de sus soluciones de software.
 
-> **Estado: versión 0.4.0.** Graba, transcribe separando hablantes, redacta la nota y
+> **Estado: versión 0.4.1.** Graba, transcribe separando hablantes, redacta la nota y
 > la copia sola a una carpeta (también de Google Drive). Se desarrolla con
 > *Spec-Driven Development*: primero se acuerda qué hace la app, luego se
 > construye. Ver la [hoja de ruta](ROADMAP.md).

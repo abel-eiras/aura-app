@@ -77,10 +77,7 @@ fun MainScreen(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 AuraLogo(size = 40.dp)
-                Column {
-                    Text(stringResource(R.string.app_name).uppercase(), style = MaterialTheme.typography.titleMedium)
-                    Text(stringResource(R.string.brand_by), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
+                Text(stringResource(R.string.app_name).uppercase(), style = MaterialTheme.typography.titleLarge)
             }
             Row(modifier = Modifier.align(Alignment.TopEnd).padding(end = 16.dp, top = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 SquareIconButton(Icons.Outlined.List, stringResource(R.string.content_description_recordings), onRecordingsClick)
