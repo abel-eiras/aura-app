@@ -3,6 +3,7 @@ package io.github.abeleiras.aura
 import android.content.Context
 import android.util.Log
 import androidx.room.Room
+import io.github.abeleiras.aura.data.AudioImporter
 import io.github.abeleiras.aura.data.RecordingRepository
 import io.github.abeleiras.aura.data.ai.CredentialStore
 import io.github.abeleiras.aura.data.ai.ProviderController
@@ -24,6 +25,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.io.File
 
 /** Hand-wired singletons (ADR-0008). Reached from anywhere via [AuraApplication.container]. */
@@ -78,6 +80,14 @@ class AppContainer(private val context: Context) {
             http = providerHttp,
             afterDrafted = { exports.exportPending() },
         )
+    }
+
+    val importer: AudioImporter by lazy {
+        AudioImporter(appContext, recordings) { fileName ->
+            // Same as a recording that has just been saved: process it if the user wants, and export it.
+            processing.onRecordingRegistered(fileName)
+            appScope.launch { exports.exportPending() }
+        }
     }
 
     val updates by lazy {

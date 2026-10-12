@@ -24,6 +24,7 @@ Empezó como una grabadora y un transcriptor para PC que solo yo sabía usar, po
 - Siempre se ve que está grabando: etiqueta, cronómetro y notificación fija.
 - Pausa y reanudación, y pausa automática si entra una llamada (si lo permites).
 - Si el móvil se queda sin espacio, o la app se cierra por sorpresa, **no pierdes lo grabado**.
+- ¿Tienes un audio que no grabaste con Aura (una nota de voz de WhatsApp, por ejemplo)? **Impórtalo** desde la lista de grabaciones, o compártelo con Aura desde la otra app: se transcribe y se redacta la nota igual que si lo hubieras grabado aquí. Admite ogg, opus, mp3, wav, flac, aac, m4a y aiff.
 
 ### Transcribir y redactar
 - La transcripción separa a las personas ("Hablante 1", "Hablante 2"…), y luego les pones nombre o unes dos que en realidad eran la misma.
@@ -142,10 +143,11 @@ Sube la versión en `gradle.properties` (`aura.versionName`), fusiona en `main` 
 | [006](specs/006-releases-y-actualizaciones/spec.md) | Releases, instalación y actualizaciones fuera de tiendas | En curso |
 | [007](specs/007-informe-de-errores/spec.md) | Pantalla de error local | Implementada |
 | [008](specs/008-identidad-visual/spec.md) | Identidad visual | Implementada |
+| [009](specs/009-importar-audio/spec.md) | Importar audio | Implementada (m4a sin verificar) |
 
 ## Estado y limitaciones conocidas
 
-> **Versión 0.4.1.** Estable para el uso diario, con estas limitaciones:
+> **Versión 0.5.0.** Estable para el uso diario, con estas limitaciones:
 
 - El único proveedor de IA es Google Gemini con clave propia; en su capa gratuita hay límites diarios que fija Google.
 - Falta la búsqueda en las notas y reproducir el audio desde un punto de la transcripción.

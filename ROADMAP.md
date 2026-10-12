@@ -46,6 +46,10 @@ funciones.
 - [x] Logotipo propio como icono de la app (adaptable y tematizado), del widget y de la pantalla principal. La app se llama "Aura"; el README cuenta que forma parte de un proyecto de Formula Farma.
 - [x] Sin enlaces a los repositorios anteriores (son privados).
 
+## Hito 2c — Importar audio (v0.5.0)
+
+- [x] **009** Importar un audio grabado fuera de Aura (selector del sistema y "Compartir con Aura") para transcribirlo y redactar su nota como si lo hubiera grabado la app. *Falta probar `m4a` y un audio de WhatsApp en el móvil (T009-09).*
+
 ## Hito 3 — Para amigos (v1.0.0)
 
 - [ ] **004** "Abrir en…" (HU-004-4).

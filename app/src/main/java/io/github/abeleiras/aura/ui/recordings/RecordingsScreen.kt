@@ -1,6 +1,10 @@
 package io.github.abeleiras.aura.ui.recordings
 
+import android.content.Context
 import android.text.format.Formatter
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.FileUpload
 import androidx.compose.material.icons.outlined.Pause
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Share
@@ -29,6 +34,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -40,6 +46,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.abeleiras.aura.R
 import io.github.abeleiras.aura.ui.components.AuraTextButton
 import io.github.abeleiras.aura.ui.components.AuraAttentionCard
+import io.github.abeleiras.aura.ui.components.AuraOutlinedButton
+import io.github.abeleiras.aura.data.ImportSummary
 import io.github.abeleiras.aura.data.Recording
 import io.github.abeleiras.aura.domain.ai.ProviderReadiness
 import io.github.abeleiras.aura.domain.export.ExportStatus
@@ -48,6 +56,7 @@ import io.github.abeleiras.aura.domain.processing.JobRecord
 import io.github.abeleiras.aura.domain.processing.JobStatus
 import io.github.abeleiras.aura.domain.recording.RecordingPolicy
 import io.github.abeleiras.aura.recording.PlaybackState
+import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.util.Date
 
@@ -57,6 +66,19 @@ fun RecordingsScreen(viewModel: RecordingsViewModel, onOpenNote: (String) -> Uni
     val items by viewModel.items.collectAsStateWithLifecycle()
     val playback by viewModel.playback.collectAsStateWithLifecycle()
     val readiness by viewModel.readiness.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    // The system picker needs no storage permission; the app only reads what the user picks (spec 009).
+    val importPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+        if (uris.isNotEmpty()) {
+            scope.launch {
+                Toast.makeText(context, context.getString(R.string.import_started), Toast.LENGTH_SHORT).show()
+                val summary = viewModel.importAudio(uris)
+                Toast.makeText(context, importMessage(context, summary), Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+    val launchImport = { importPicker.launch(arrayOf("audio/*", "application/ogg")) }
     var pendingDelete by remember { mutableStateOf<RecordingItem?>(null) }
     var detailsFor by remember { mutableStateOf<RecordingItem?>(null) }
 
@@ -64,6 +86,11 @@ fun RecordingsScreen(viewModel: RecordingsViewModel, onOpenNote: (String) -> Uni
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.recordings_title)) },
+                actions = {
+                    IconButton(onClick = launchImport) {
+                        Icon(Icons.Outlined.FileUpload, contentDescription = stringResource(R.string.import_audio))
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.content_description_back))
@@ -76,11 +103,14 @@ fun RecordingsScreen(viewModel: RecordingsViewModel, onOpenNote: (String) -> Uni
         when {
             list == null -> Box(Modifier.fillMaxSize().padding(padding))
             list.isEmpty() -> Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                Text(
-                    text = stringResource(R.string.recordings_empty),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Text(
+                        text = stringResource(R.string.recordings_empty),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    )
+                    AuraOutlinedButton(onClick = launchImport) { Text(stringResource(R.string.import_audio)) }
+                }
             }
             else -> RecordingsList(
                 items = list,
@@ -364,4 +394,15 @@ private fun ErrorDetailsDialog(item: RecordingItem, onDismiss: () -> Unit) {
         },
         dismissButton = { AuraTextButton(onClick = onDismiss) { Text(stringResource(R.string.crash_close)) } },
     )
+}
+
+/** One sentence that says what happened to the picked files, and why for any that were not imported (FR-009-08). */
+internal fun importMessage(context: Context, summary: ImportSummary): String {
+    val parts = mutableListOf<String>()
+    if (summary.imported > 0) parts += context.resources.getQuantityString(R.plurals.import_done, summary.imported, summary.imported)
+    if (summary.unsupported > 0) parts += context.getString(R.string.import_unsupported, summary.unsupported)
+    if (summary.unreadable > 0) parts += context.getString(R.string.import_unreadable, summary.unreadable)
+    if (summary.noSpace > 0) parts += context.getString(R.string.import_no_space, summary.noSpace)
+    if (summary.failed > 0) parts += context.getString(R.string.import_failed, summary.failed)
+    return parts.joinToString(" ")
 }
