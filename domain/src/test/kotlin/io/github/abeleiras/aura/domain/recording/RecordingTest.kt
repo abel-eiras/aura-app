@@ -20,7 +20,8 @@ class RecordingTest {
     @Test
     fun `FR-001-08 file name round-trips and rejects foreign names`() {
         assertEquals(t0, RecordingNaming.startedAtMillis("aura_20261006_101500.ogg", madrid))
-        assertNull(RecordingNaming.startedAtMillis("aura_20261006_101500.wav", madrid))
+        assertEquals(t0, RecordingNaming.startedAtMillis("aura_20261006_101500.wav", madrid))
+        assertNull(RecordingNaming.startedAtMillis("aura_20261006_101500.txt", madrid))
         assertNull(RecordingNaming.startedAtMillis("nota.ogg", madrid))
         assertNull(RecordingNaming.startedAtMillis("aura_20269999_999999.ogg", madrid))
         assertEquals("2026-10-06", RecordingNaming.date(t0, madrid))

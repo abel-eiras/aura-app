@@ -2,6 +2,7 @@ package io.github.abeleiras.aura.domain.ai
 
 import io.github.abeleiras.aura.domain.net.awaitResponse
 import io.github.abeleiras.aura.domain.processing.AiProvider
+import io.github.abeleiras.aura.domain.recording.AudioFormats
 import io.github.abeleiras.aura.domain.processing.ErrorReason
 import io.github.abeleiras.aura.domain.processing.LanguageHints
 import io.github.abeleiras.aura.domain.processing.ProviderException
@@ -280,14 +281,7 @@ class GeminiProvider(
         private var lastCallNanos: Long? = null
         private val JSON_MEDIA = "application/json".toMediaType()
 
-        fun mimeTypeOf(file: File): String = when (file.extension.lowercase()) {
-            "ogg", "oga", "opus" -> "audio/ogg"
-            "wav" -> "audio/wav"
-            "mp3" -> "audio/mp3"
-            "flac" -> "audio/flac"
-            "aac", "m4a" -> "audio/aac"
-            else -> "audio/ogg"
-        }
+        fun mimeTypeOf(file: File): String = AudioFormats.mimeType(file.extension)
 
         fun transcriptionPrompt(hints: LanguageHints): String {
             val languages = listOfNotNull(hints.primary, hints.secondary).joinToString(", ")

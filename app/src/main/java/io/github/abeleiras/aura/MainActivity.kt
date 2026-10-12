@@ -22,7 +22,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import android.widget.Toast
+import io.github.abeleiras.aura.ui.recordings.importMessage
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -57,6 +61,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         openNote.value = intent?.getStringExtra(EXTRA_OPEN_NOTE)
+        importSharedAudio(intent)
         val versionName = packageManager.getPackageInfo(packageName, 0).versionName.orEmpty()
         setContent {
             AuraTheme {
@@ -68,7 +73,35 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         intent.getStringExtra(EXTRA_OPEN_NOTE)?.let { openNote.value = it }
+        importSharedAudio(intent)
     }
+
+    /** "Share with Aura" from another app (spec 009, HU-009-2): import what was shared, as from the picker. */
+    private fun importSharedAudio(intent: Intent?) {
+        val shared = intent ?: return
+        val uris: List<Uri> = when (shared.action) {
+            Intent.ACTION_SEND -> listOfNotNull(shared.parcelable(Intent.EXTRA_STREAM))
+            Intent.ACTION_SEND_MULTIPLE -> shared.parcelableList(Intent.EXTRA_STREAM)
+            else -> return
+        }
+        if (uris.isEmpty()) return
+        // Once handled, the intent must not import again if the activity is recreated.
+        shared.action = null
+        Toast.makeText(this, getString(R.string.import_started), Toast.LENGTH_SHORT).show()
+        container.appScope.launch {
+            val summary = container.importer.importAll(uris)
+            withContext(Dispatchers.Main) { Toast.makeText(this@MainActivity, importMessage(this@MainActivity, summary), Toast.LENGTH_LONG).show() }
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun Intent.parcelable(key: String): Uri? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) getParcelableExtra(key, Uri::class.java) else getParcelableExtra(key)
+
+    @Suppress("DEPRECATION")
+    private fun Intent.parcelableList(key: String): List<Uri> =
+        (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) getParcelableArrayListExtra(key, Uri::class.java) else getParcelableArrayListExtra<Uri>(key))
+            .orEmpty()
 
     override fun onStart() {
         super.onStart()

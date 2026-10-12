@@ -231,4 +231,14 @@
     <string name="main_resume">Resume</string>
     <string name="main_stop">Stop and save</string>
     <string name="content_description_record">Start recording</string>
+    <string name="import_audio">Import audio</string>
+    <string name="import_started">Importing…</string>
+    <string name="import_unsupported">%1$d file(s) skipped: not a supported audio format (ogg, opus, mp3, wav, flac, aac, m4a, aiff).</string>
+    <string name="import_unreadable">%1$d file(s) skipped: they could not be read as audio.</string>
+    <string name="import_no_space">%1$d file(s) not imported: not enough free space.</string>
+    <string name="import_failed">%1$d file(s) could not be imported.</string>
+    <plurals name="import_done">
+        <item quantity="one">One audio imported.</item>
+        <item quantity="other">%d audios imported.</item>
+    </plurals>
 </resources>

@@ -1,14 +1,17 @@
 package io.github.abeleiras.aura.ui.recordings
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.abeleiras.aura.AppContainer
+import io.github.abeleiras.aura.data.ImportSummary
 import io.github.abeleiras.aura.data.Recording
 import io.github.abeleiras.aura.data.processing.ProcessingRepository
 import io.github.abeleiras.aura.domain.processing.JobRecord
 import io.github.abeleiras.aura.domain.ai.ProviderReadiness
 import io.github.abeleiras.aura.domain.export.ExportStatus
 import io.github.abeleiras.aura.recording.PlaybackState
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -59,6 +62,10 @@ class RecordingsViewModel(private val container: AppContainer) : ViewModel() {
     fun processAllPending() {
         container.appScope.launch { container.processing.enqueuePending() }
     }
+
+    /** Runs in the app scope: leaving the screen must not leave a copy half done (spec 009, FR-009-04). */
+    suspend fun importAudio(uris: List<Uri>): ImportSummary =
+        container.appScope.async { container.importer.importAll(uris) }.await()
 
     fun process(recording: Recording) = container.processing.enqueue(recording.fileName)
 

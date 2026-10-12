@@ -231,4 +231,14 @@
     <string name="main_resume">Reanudar</string>
     <string name="main_stop">Parar e gardar</string>
     <string name="content_description_record">Comezar a gravar</string>
+    <string name="import_audio">Importar audio</string>
+    <string name="import_started">Importando…</string>
+    <string name="import_unsupported">%1$d ficheiro(s) descartado(s): non é un formato de audio admitido (ogg, opus, mp3, wav, flac, aac, m4a, aiff).</string>
+    <string name="import_unreadable">%1$d ficheiro(s) descartado(s): non se puideron ler como audio.</string>
+    <string name="import_no_space">%1$d ficheiro(s) sen importar: non hai espazo libre suficiente.</string>
+    <string name="import_failed">%1$d ficheiro(s) non se puideron importar.</string>
+    <plurals name="import_done">
+        <item quantity="one">1 audio importado.</item>
+        <item quantity="other">%d audios importados.</item>
+    </plurals>
 </resources>

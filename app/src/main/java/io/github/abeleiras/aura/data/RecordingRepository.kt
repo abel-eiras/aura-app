@@ -55,7 +55,7 @@ class RecordingRepository(
      */
     suspend fun recoverOrphans(): Int = withContext(Dispatchers.IO) {
         val known = dao.fileNames().toSet()
-        val orphans = directory().listFiles { f -> f.isFile && f.name.endsWith(".${RecordingNaming.EXTENSION}") }
+        val orphans = directory().listFiles { f -> f.isFile && RecordingNaming.isRecordingFile(f.name) }
             .orEmpty()
             .filter { it.name !in known && it.length() > 0 }
         orphans.forEach { file ->
@@ -66,6 +66,9 @@ class RecordingRepository(
         }
         orphans.size
     }
+
+    /** Length of [file] read as audio, or 0 if it can't be read as such. */
+    fun durationMillisOf(file: File): Long = readDurationMillis(file)
 
     private fun readDurationMillis(file: File): Long {
         val retriever = MediaMetadataRetriever()
